@@ -31,6 +31,7 @@ class GameManager {
       socket.on('discardCards', (data) => this.handleDiscardCards(socket, data));
       socket.on('counterAction', (data) => this.handleCounterAction(socket, data));
       socket.on('rejoin', (data) => this.handleRejoin(socket, data));
+      socket.on('requestRestart', () => this.handleRequestRestart(socket));
       socket.on('disconnect', () => this.handleDisconnect(socket));
     });
   }
@@ -41,6 +42,7 @@ class GameManager {
     if (data.houseRuleAllQueens) {
       gameState.houseRuleAllQueens = true;
     }
+    gameState.restartRequests = new Set();
     this.games.set(sessionId, gameState);
 
     socket.join(sessionId);
@@ -734,7 +736,8 @@ class GameManager {
       name: p.name,
       score: p.score,
       queenCount: p.awakenedQueens.length,
-      hand: p.hand // Add hand info for display
+      hand: p.hand,
+      awakenedQueens: p.awakenedQueens
     }));
 
     const winner = game.getPlayer(winnerId);
@@ -753,8 +756,8 @@ class GameManager {
       resultText += `\n### Final Standings\n`;
       scores.sort((a, b) => b.score - a.score).forEach((p, i) => {
         resultText += `${i + 1}. **${p.name}** - Queens: ${p.queenCount}, Score: ${p.score}\n`;
-        const handStr = p.hand.map(c => c.type === 'number' ? c.value : c.type).join(', ');
-        resultText += `   - Hand: ${handStr}\n`;
+        const queensStr = p.awakenedQueens.map(q => q.name).join(', ');
+        resultText += `   - Queens: ${queensStr}\n`;
       });
       resultText += `\n---\n`;
 
@@ -793,6 +796,69 @@ class GameManager {
     const game = this.games.get(sessionInfo.sessionId);
     return game ? { game, sessionId: sessionInfo.sessionId } : null;
   }
-}
 
+  handleRequestRestart(socket) {
+    const session = this.findGameBySocket(socket.id);
+    if (!session) return;
+
+    const { game, sessionId } = session;
+    const player = game.getPlayer(socket.id);
+
+    if (!player || game.phase !== 'ended') return;
+
+    if (!game.restartRequests) {
+      game.restartRequests = new Set();
+    }
+
+    game.restartRequests.add(player.id);
+
+    // Broadcast status
+    const currentVotes = game.restartRequests.size;
+    const totalPlayers = game.players.length;
+
+    this.io.to(sessionId).emit('restartStatus', {
+      current: currentVotes,
+      total: totalPlayers
+    });
+
+    this.io.to(sessionId).emit('actionResult', {
+      success: true,
+      message: `${player.name}님이 재경기를 요청했습니다 (${currentVotes}/${totalPlayers})`
+    });
+
+    if (currentVotes >= totalPlayers) {
+      this.restartGame(sessionId);
+    }
+  }
+
+  restartGame(sessionId) {
+    const game = this.games.get(sessionId);
+    if (!game) return;
+
+    // Reset game state but keep players
+    // Reuse initializeGame logic
+    const deck = new CardDeck();
+    game.initializeGame(deck);
+    game.restartRequests.clear();
+
+    // Notify everyone
+    this.io.to(sessionId).emit('actionResult', {
+      success: true,
+      message: '모든 플레이어가 동의하여 게임을 다시 시작합니다!'
+    });
+
+    // Send game state to all
+    this.broadcastGameState(sessionId);
+
+    // Send individual hands
+    game.players.forEach(player => {
+      this.io.to(player.id).emit('playerHand', { cards: player.hand });
+    });
+
+    // Start first turn
+    this.startTurn(sessionId);
+
+    console.log(`Game ${sessionId} restarted`);
+  }
+}
 module.exports = GameManager;

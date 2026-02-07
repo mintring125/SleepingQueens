@@ -521,7 +521,8 @@ button:disabled {
 /* ============================================
    Result Hand Styles - Compact & Clean (Shared)
    ============================================ */
-.score-row.has-hand {
+.score-row.has-hand,
+.score-row.has-queens {
   flex-direction: column;
   align-items: stretch;
   gap: 4px;
@@ -604,4 +605,11 @@ button:disabled {
 
 .result-hand .card-inner {
   border-width: 1px;
+}
+
+.result-queens-container {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.05);
+  width: 100%;
 }

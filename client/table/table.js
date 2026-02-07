@@ -253,8 +253,8 @@ function showGameEnd(data) {
 
   data.scores.sort((a, b) => b.score - a.score).forEach((s, i) => {
     const row = document.createElement('div');
-    const hasHand = s.hand && s.hand.length > 0;
-    row.className = `score-row ${s.id === data.winnerId ? 'winner' : ''} ${hasHand ? 'has-hand' : ''}`;
+    const hasQueens = s.awakenedQueens && s.awakenedQueens.length > 0;
+    row.className = `score-row ${s.id === data.winnerId ? 'winner' : ''} ${hasQueens ? 'has-queens' : ''}`;
 
     // Header section (Name & Score)
     const header = document.createElement('div');
@@ -265,23 +265,29 @@ function showGameEnd(data) {
     `;
     row.appendChild(header);
 
-    // Hand section
-    if (hasHand) {
-      const handContainer = document.createElement('div');
-      handContainer.className = 'result-hand-container';
+    // Queens section
+    if (s.awakenedQueens && s.awakenedQueens.length > 0) {
+      const queensContainer = document.createElement('div');
+      queensContainer.className = 'result-queens-container';
 
-      const handEl = document.createElement('div');
-      handEl.className = 'result-hand';
+      const queensEl = document.createElement('div');
+      queensEl.className = 'result-queens';
+      queensEl.style.display = 'flex';
+      queensEl.style.gap = '5px';
+      queensEl.style.marginTop = '10px';
+      queensEl.style.flexWrap = 'wrap';
 
-      s.hand.forEach(card => {
-        const cardEl = createCardElement(card, { selected: false });
-        // Remove critical inline styles if createCardElement adds any (it doesn't seem to)
-        // But we rely on CSS variables in .result-hand to size them
-        handEl.appendChild(cardEl);
+      s.awakenedQueens.forEach(queen => {
+        const queenEl = createQueenElement(queen);
+        // Style adjustments for result view
+        queenEl.style.width = '60px';
+        queenEl.style.height = '84px';
+        queenEl.style.fontSize = '0.7em';
+        queensEl.appendChild(queenEl);
       });
 
-      handContainer.appendChild(handEl);
-      row.appendChild(handContainer);
+      queensContainer.appendChild(queensEl);
+      row.appendChild(queensContainer);
     }
 
     scoresDiv.appendChild(row);

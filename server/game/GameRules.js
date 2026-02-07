@@ -12,36 +12,27 @@ class GameRules {
    */
   static validateDiscardCards(cards) {
     if (!cards || !Array.isArray(cards) || cards.length === 0) {
-      return { valid: false, message: 'No cards provided' };
+      return { valid: false, message: '카드를 선택해주세요' };
     }
 
     // All must be number cards
     if (cards.some(card => !card.value || typeof card.value !== 'number')) {
-      return { valid: false, message: 'All cards must be number cards' };
+      return { valid: false, message: '숫자 카드만 버릴 수 있습니다' };
     }
 
     const count = cards.length;
 
     // Single card
     if (count === 1) {
-      return { valid: true, message: 'Valid single card' };
+      return { valid: true, message: '유효한 버리기입니다' };
     }
 
     // Pair: exactly 2 cards with same value
     if (count === 2) {
       if (cards[0].value === cards[1].value) {
-        return { valid: true, message: 'Valid pair' };
+        return { valid: true, message: '유효한 쌍입니다' };
       }
-      // Check if it's a valid equation (first + second = second is impossible)
-      // Actually check: cards[0] = cards[1] (which is the pair case above)
-      // Or equation: cards[0] = cards[1] (e.g., 2 = 2) - no, that's not how equations work
-      // Equation with 2 cards: first card = second card value? No.
-      // Example: [3, 7] could be valid if 3 = 7? No.
-      // Actually for 2 cards: first must equal second (pair), OR first = second (same as pair)
-      // Re-reading spec: equation means sum of all except last equals last
-      // So [3, 3] → 3 = 3 (valid)
-      // [3, 7] → 3 = 7 (invalid)
-      return { valid: false, message: 'Two cards must be a pair or valid equation' };
+      return { valid: false, message: '두 장을 버리려면 숫자가 같아야 합니다' };
     }
 
     // Equation: 3-5 cards where sum of N-1 cards equals the Nth card
@@ -52,12 +43,12 @@ class GameRules {
 
       // If sum of parts = Max, then TotalSum = Sum of parts + Max = 2 * Max
       if (totalSum === maxVal * 2) {
-        return { valid: true, message: 'Valid equation' };
+        return { valid: true, message: '유효한 식입니다' };
       }
-      return { valid: false, message: 'Equation invalid: Sum of smaller numbers must equal the largest number' };
+      return { valid: false, message: '식이 올바르지 않습니다. 작은 숫자들의 합이 가장 큰 숫자와 같아야 합니다' };
     }
 
-    return { valid: false, message: 'Invalid card count or combination' };
+    return { valid: false, message: '유효하지 않은 카드 장수이거나 조합입니다' };
   }
 
   /**
@@ -69,7 +60,7 @@ class GameRules {
    */
   static validatePlayCard(card, gameState, playerId) {
     if (!card || !card.type) {
-      return { valid: false, message: 'Invalid card' };
+      return { valid: false, message: '유효하지 않은 카드입니다' };
     }
 
     const { type, targetQueenId, targetPlayerId } = card;
@@ -77,76 +68,76 @@ class GameRules {
     switch (type) {
       case 'king':
         if (!targetQueenId) {
-          return { valid: false, message: 'King requires targetQueenId' };
+          return { valid: false, message: '깨울 퀸을 선택해야 합니다' };
         }
         // Check if queen exists in sleepingQueens
         if (!gameState.sleepingQueens.find(q => q.id === targetQueenId)) {
-          return { valid: false, message: 'Target queen is not sleeping' };
+          return { valid: false, message: '해당 퀸은 잠들어 있지 않습니다' };
         }
-        return { valid: true, message: 'Valid king play' };
+        return { valid: true, message: '왕 카드 사용 가능' };
 
       case 'knight':
         if (!targetPlayerId || !targetQueenId) {
-          return { valid: false, message: 'Knight requires targetPlayerId and targetQueenId' };
+          return { valid: false, message: '대상 플레이어와 퀸을 선택해야 합니다' };
         }
         if (targetPlayerId === playerId) {
-          return { valid: false, message: 'Cannot steal from yourself' };
+          return { valid: false, message: '자신의 퀸은 훔칠 수 없습니다' };
         }
         // Check if target player has that queen
         const targetPlayer = gameState.getPlayer(targetPlayerId);
         if (!targetPlayer) {
-          return { valid: false, message: 'Target player not found' };
+          return { valid: false, message: '대상 플레이어를 찾을 수 없습니다' };
         }
         if (!targetPlayer.awakenedQueens.find(q => q.id === targetQueenId)) {
-          return { valid: false, message: 'Target player does not have that queen' };
+          return { valid: false, message: '대상 플레이어에게 해당 퀸이 없습니다' };
         }
-        return { valid: true, message: 'Valid knight play' };
+        return { valid: true, message: '기사 카드 사용 가능' };
 
       case 'potion':
         if (!targetPlayerId || !targetQueenId) {
-          return { valid: false, message: 'Sleeping potion requires targetPlayerId and targetQueenId' };
+          return { valid: false, message: '대상 플레이어와 퀸을 선택해야 합니다' };
         }
         if (targetPlayerId === playerId) {
-          return { valid: false, message: 'Cannot use potion on yourself' };
+          return { valid: false, message: '자신의 퀸에게는 사용할 수 없습니다' };
         }
         // Check if target player has that queen
         const potionTarget = gameState.getPlayer(targetPlayerId);
         if (!potionTarget) {
-          return { valid: false, message: 'Target player not found' };
+          return { valid: false, message: '대상 플레이어를 찾을 수 없습니다' };
         }
         if (!potionTarget.awakenedQueens.find(q => q.id === targetQueenId)) {
-          return { valid: false, message: 'Target player does not have that queen' };
+          return { valid: false, message: '대상 플레이어에게 해당 퀸이 없습니다' };
         }
-        return { valid: true, message: 'Valid sleeping potion play' };
+        return { valid: true, message: '물약 카드 사용 가능' };
 
       case 'dragon':
         // Only valid during counter phase when countering a knight
         if (gameState.turnPhase !== 'counter') {
-          return { valid: false, message: 'Dragon can only be played during counter phase' };
+          return { valid: false, message: '드래곤은 반격 단계에서만 사용할 수 있습니다' };
         }
         if (!gameState.pendingAction || gameState.pendingAction.type !== 'knight') {
-          return { valid: false, message: 'Dragon can only counter knight attacks' };
+          return { valid: false, message: '드래곤은 기사 공격만 막을 수 있습니다' };
         }
         if (gameState.pendingAction.targetPlayerId !== playerId) {
-          return { valid: false, message: 'Dragon can only counter attacks against you' };
+          return { valid: false, message: '자신을 향한 공격만 막을 수 있습니다' };
         }
-        return { valid: true, message: 'Valid dragon counter' };
+        return { valid: true, message: '드래곤 카드 사용 가능' };
 
       case 'wand':
         // Only valid during counter phase when countering a sleeping potion
         if (gameState.turnPhase !== 'counter') {
-          return { valid: false, message: 'Wand can only be played during counter phase' };
+          return { valid: false, message: '마법봉은 반격 단계에서만 사용할 수 있습니다' };
         }
         if (!gameState.pendingAction || gameState.pendingAction.type !== 'potion') {
-          return { valid: false, message: 'Wand can only counter sleeping potion attacks' };
+          return { valid: false, message: '마법봉은 물약 공격만 막을 수 있습니다' };
         }
         if (gameState.pendingAction.targetPlayerId !== playerId) {
-          return { valid: false, message: 'Wand can only counter attacks against you' };
+          return { valid: false, message: '자신을 향한 공격만 막을 수 있습니다' };
         }
-        return { valid: true, message: 'Valid wand counter' };
+        return { valid: true, message: '마법봉 카드 사용 가능' };
 
       default:
-        return { valid: false, message: `Unknown card type: ${type}` };
+        return { valid: false, message: `알 수 없는 카드 타입: ${type}` };
     }
   }
 
@@ -172,15 +163,15 @@ class GameRules {
 
     // If trying to get Cat Queen but already has Dog Queen
     if (queenId === CAT_QUEEN && hasDog) {
-      return { conflict: true, message: 'Cannot own both Cat Queen and Dog Queen' };
+      return { conflict: true, message: '고양이 퀸과 강아지 퀸은 함께 가질 수 없습니다' };
     }
 
     // If trying to get Dog Queen but already has Cat Queen
     if (queenId === DOG_QUEEN && hasCat) {
-      return { conflict: true, message: 'Cannot own both Cat Queen and Dog Queen' };
+      return { conflict: true, message: '강아지 퀸과 고양이 퀸은 함께 가질 수 없습니다' };
     }
 
-    return { conflict: false, message: 'No conflict' };
+    return { conflict: false, message: '충돌 없음' };
   }
 
   /**

@@ -77,6 +77,13 @@ document.addEventListener('DOMContentLoaded', () => {
   socketManager.on('gameEnd', (data) => {
     showGameEnd(data);
   });
+
+  socketManager.on('restartStatus', (data) => {
+    const statusEl = document.getElementById('restartStatus');
+    if (statusEl) {
+      statusEl.textContent = `재경기 투표: ${data.current}/${data.total} 명`;
+    }
+  });
 });
 
 function updateDisplay() {
@@ -264,28 +271,71 @@ function closeTargetModal() {
 function discardSelected() {
   if (selectedCards.length === 0) return;
 
+  // Get selected card objects for validation
+  const selectedObjects = myHand.filter(c => selectedCards.includes(c.id));
+
+  // Validate locally before animation/sending
+  const validation = validateLocalDiscard(selectedObjects);
+  if (!validation.valid) {
+    showToast(validation.message, 'error');
+    // Do NOT clear selectedCards here so user can correct their selection
+    return;
+  }
+
   // Get card elements that are selected
   const container = document.getElementById('myHand');
   const cardElements = container.querySelectorAll('.card.selected');
 
-  if (cardElements.length === 0) {
-    socketManager.emit('discardCards', { cardIds: selectedCards });
-    selectedCards = [];
-    return;
+  // Add fly-up animation to each selected card
+  if (cardElements.length > 0) {
+    cardElements.forEach((el, index) => {
+      el.style.animationDelay = `${index * 0.1}s`;
+      el.classList.add('discard-fly-up');
+    });
   }
 
-  // Add fly-up animation to each selected card
-  cardElements.forEach((el, index) => {
-    el.style.animationDelay = `${index * 0.1}s`;
-    el.classList.add('discard-fly-up');
-  });
-
   // Wait for animation to complete, then send discard
-  const animDuration = 500 + (cardElements.length - 1) * 100; // base + stagger delay
+  // If no elements (shouldn't happen if validation passed), send immediately
+  const animDuration = cardElements.length > 0 ? (500 + (cardElements.length - 1) * 100) : 0;
+
   setTimeout(() => {
     socketManager.emit('discardCards', { cardIds: selectedCards });
     selectedCards = [];
   }, animDuration);
+}
+
+function validateLocalDiscard(cards) {
+  if (!cards || cards.length === 0) return { valid: false, message: '카드를 선택해주세요' };
+
+  // All must be number cards
+  if (cards.some(c => c.type !== 'number')) {
+    return { valid: false, message: '숫자 카드만 버릴 수 있습니다' };
+  }
+
+  const count = cards.length;
+  // Parse values to ensure they are numbers
+  const values = cards.map(c => typeof c.value === 'string' ? parseInt(c.value) : c.value);
+
+  // Single card
+  if (count === 1) return { valid: true };
+
+  // Pair
+  if (count === 2) {
+    if (values[0] === values[1]) return { valid: true };
+    return { valid: false, message: '두 장을 버리려면 숫자가 같아야 합니다' };
+  }
+
+  // Equation
+  if (count >= 3 && count <= 5) {
+    const totalSum = values.reduce((a, b) => a + b, 0);
+    const maxVal = Math.max(...values);
+    // Logic: Sum of smaller numbers = Largest number
+    // So TotalSum = Sum(smaller) + Max = Max + Max = 2 * Max
+    if (totalSum === maxVal * 2) return { valid: true };
+    return { valid: false, message: '식이 올바르지 않습니다. 작은 숫자들의 합이 가장 큰 숫자와 같아야 합니다' };
+  }
+
+  return { valid: false, message: '유효하지 않은 카드 장수이거나 조합입니다' };
 }
 
 function showCounterModal(data) {
@@ -405,11 +455,9 @@ function showGameEnd(data) {
   data.scores.sort((a, b) => b.score - a.score).forEach((s, i) => {
     const row = document.createElement('div');
     const isMe = s.id === socketManager.playerId;
-    const hasHand = s.hand && s.hand.length > 0;
+    const hasQueens = s.awakenedQueens && s.awakenedQueens.length > 0;
 
-    // Add 'score-row' and other classes
-    // Note: player.css handles .score-row.winner and .score-row.me
-    row.className = `score-row ${s.id === data.winnerId ? 'winner' : ''} ${isMe ? 'me' : ''} ${hasHand ? 'has-hand' : ''}`;
+    row.className = `score-row ${s.id === data.winnerId ? 'winner' : ''} ${isMe ? 'me' : ''} ${hasQueens ? 'has-queens' : ''}`;
 
     // Header section
     const header = document.createElement('div');
@@ -420,46 +468,57 @@ function showGameEnd(data) {
     `;
     row.appendChild(header);
 
-    // Hand section
-    if (hasHand) {
-      const handContainer = document.createElement('div');
-      handContainer.className = 'result-hand-container';
+    // Queens section - Display Awakened Queens
+    if (s.awakenedQueens && s.awakenedQueens.length > 0) {
+      const queensContainer = document.createElement('div');
+      queensContainer.className = 'result-queens-container';
 
-      const handEl = document.createElement('div');
-      handEl.className = 'result-hand';
+      const queensEl = document.createElement('div');
+      queensEl.className = 'result-queens';
+      queensEl.style.display = 'flex';
+      queensEl.style.gap = '5px';
+      queensEl.style.marginTop = '8px';
+      queensEl.style.flexWrap = 'wrap';
+      queensEl.style.justifyContent = 'center';
 
-      s.hand.forEach(card => {
-        const cardEl = createCardElement(card, { selected: false });
-        handEl.appendChild(cardEl);
+      s.awakenedQueens.forEach(queen => {
+        const queenEl = createQueenElement(queen);
+        // Smaller size for list
+        queenEl.style.width = '45px';
+        queenEl.style.height = '63px';
+        queenEl.style.fontSize = '0.6em';
+        queensEl.appendChild(queenEl);
       });
 
-      handContainer.appendChild(handEl);
-      row.appendChild(handContainer);
+      queensContainer.appendChild(queensEl);
+      row.appendChild(queensContainer);
     }
 
     resultDiv.appendChild(row);
   });
 
-  // Handle restart button visibility based on host status
-  const restartBtn = document.getElementById('restartGameBtn');
-  if (restartBtn) {
-    if (socketManager.isHost) {
-      restartBtn.classList.remove('hidden');
-      restartBtn.onclick = () => {
-        socketManager.emit('restartGame');
-      };
-    } else {
-      restartBtn.classList.add('hidden');
-    }
-  }
+  // Vote Restart Section
+  const restartArea = document.createElement('div');
+  restartArea.id = 'restartArea';
+  restartArea.className = 'restart-area';
+  restartArea.style.marginTop = '20px';
+  restartArea.style.textAlign = 'center';
 
-  // Ensure Main Menu button is always present
-  const mainMenuBtn = document.getElementById('mainMenuBtn');
-  if (mainMenuBtn) {
-    mainMenuBtn.onclick = () => {
-      window.location.reload(); // Simple reload to go back to main menu/lobby
-    };
-  }
+  restartArea.innerHTML = `
+    <button class="primary" id="voteRestartBtn" onclick="voteRestart()">
+      재경기 투표하기
+    </button>
+    <div id="restartStatus" class="restart-status" style="margin-top: 10px; font-size: 0.9em; color: var(--text-secondary);"></div>
+  `;
+
+  resultDiv.appendChild(restartArea);
+}
+
+function voteRestart() {
+  const btn = document.getElementById('voteRestartBtn');
+  btn.disabled = true;
+  btn.textContent = '투표 완료 (대기 중...)';
+  socketManager.emit('requestRestart');
 }
 
 function showToast(message, type = 'info') {
