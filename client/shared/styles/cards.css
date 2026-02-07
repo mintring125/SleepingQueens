@@ -1,0 +1,507 @@
+/* ============================================
+   Card Styles - Magical & Playful
+   ============================================ */
+
+.card {
+  width: var(--card-width);
+  height: var(--card-height);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  flex-shrink: 0;
+  perspective: 1000px;
+}
+
+.card:hover {
+  transform: translateY(-12px) rotate(-2deg);
+  z-index: 10;
+}
+
+.card.selected {
+  transform: translateY(-16px) scale(1.05);
+  z-index: 20;
+}
+
+.card.selected .card-inner {
+  box-shadow:
+    0 0 0 4px var(--primary),
+    0 0 20px rgba(124, 58, 237, 0.5),
+    0 12px 30px rgba(0, 0, 0, 0.2);
+  border-color: var(--primary);
+}
+
+.card.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  filter: grayscale(50%);
+}
+
+.card-inner {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+  border: 3px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Image-based card styles */
+.card-image-container {
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+}
+
+.card-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+  border-radius: var(--radius-md);
+}
+
+/* Card shine effect */
+.card-inner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.3) 50%,
+      transparent 70%);
+  transform: rotate(45deg);
+  transition: all 0.5s;
+  opacity: 0;
+}
+
+.card:hover .card-inner::before {
+  opacity: 1;
+  animation: cardShine 0.6s ease;
+}
+
+@keyframes cardShine {
+  from {
+    transform: translateX(-100%) rotate(45deg);
+  }
+
+  to {
+    transform: translateX(100%) rotate(45deg);
+  }
+}
+
+.card-emoji {
+  font-size: 36px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.card-name {
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Number cards - Special styling */
+.card.number .card-inner {
+  background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+  border-color: #7DD3FC;
+}
+
+.card.number .card-emoji {
+  font-family: 'Nunito', sans-serif;
+  font-size: 42px;
+  font-weight: 800;
+  color: var(--primary);
+  text-shadow: 0 2px 4px rgba(124, 58, 237, 0.2);
+}
+
+/* Action cards - Vibrant colors */
+.card.king .card-inner {
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+  border-color: var(--gold);
+}
+
+.card.knight .card-inner {
+  background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+  border-color: #60A5FA;
+}
+
+.card.dragon .card-inner {
+  background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+  border-color: #F87171;
+}
+
+.card.potion .card-inner {
+  background: linear-gradient(135deg, #E0E7FF 0%, #C7D2FE 100%);
+  border-color: #818CF8;
+}
+
+.card.wand .card-inner {
+  background: linear-gradient(135deg, #FCE7F3 0%, #FBCFE8 100%);
+  border-color: var(--accent);
+}
+
+.card.jester .card-inner {
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+  border-color: var(--secondary);
+}
+
+/* Card back (for opponent display) */
+.card-back {
+  width: var(--card-width);
+  height: var(--card-height);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-back::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+}
+
+.card-back::after {
+  content: '👑';
+  font-size: 32px;
+  opacity: 0.7;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* ============================================
+   Queen Card Styles - Majestic & Magical
+   ============================================ */
+
+.queen {
+  width: var(--queen-size);
+  height: var(--queen-size);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: default;
+  position: relative;
+}
+
+.queen.selectable {
+  cursor: pointer;
+}
+
+.queen.selectable:hover {
+  transform: scale(1.15) rotate(-3deg);
+  z-index: 10;
+}
+
+.queen.selectable:hover .queen-inner {
+  box-shadow:
+    0 0 0 3px var(--gold),
+    0 0 30px rgba(245, 158, 11, 0.5);
+}
+
+.queen-inner {
+  width: 100%;
+  height: 100%;
+  border: 4px solid;
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Image-based queen styles */
+.queen-image-container {
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+.queen-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+}
+
+.queen-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+  border-radius: var(--radius-lg);
+}
+
+/* Sleeping queen - Face Down Card Back */
+.queen-back {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+  border: 4px solid #4C1D95;
+}
+
+.queen-back::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+}
+
+.queen-back-design {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.queen-back-icon {
+  font-size: 28px;
+  opacity: 0.6;
+  animation: float 3s ease-in-out infinite;
+}
+
+.queen-back-text {
+  font-size: 24px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.queen.sleeping:hover .queen-back {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
+}
+
+.queen.sleeping.selectable:hover .queen-back {
+  box-shadow:
+    0 0 0 3px var(--gold),
+    0 0 30px rgba(245, 158, 11, 0.5);
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(-10deg);
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(10deg);
+  }
+}
+
+/* Awake queen - Glowing effect */
+.queen.awake .queen-inner {
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.4),
+    inset 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.queen.awake::before {
+  content: '✨';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  font-size: 18px;
+  animation: sparkle 1.5s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
+}
+
+.queen-emoji {
+  font-size: 36px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+}
+
+.queen-name {
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.queen-points {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--primary);
+  background: rgba(124, 58, 237, 0.1);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* Queen-specific colors */
+.queen[data-queen="rose"] .queen-inner {
+  background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%);
+  border-color: #FB7185;
+}
+
+.queen[data-queen="cat"] .queen-inner {
+  background: linear-gradient(135deg, #F5F5F4 0%, #E7E5E4 100%);
+  border-color: #78716C;
+}
+
+.queen[data-queen="dog"] .queen-inner {
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+  border-color: #D97706;
+}
+
+.queen[data-queen="pancake"] .queen-inner {
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+  border-color: #F59E0B;
+}
+
+.queen[data-queen="ladybug"] .queen-inner {
+  background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+  border-color: #EF4444;
+}
+
+.queen[data-queen="sunflower"] .queen-inner {
+  background: linear-gradient(135deg, #FEF9C3 0%, #FEF08A 100%);
+  border-color: #FACC15;
+}
+
+.queen[data-queen="icecream"] .queen-inner {
+  background: linear-gradient(135deg, #FCE7F3 0%, #FBCFE8 100%);
+  border-color: #EC4899;
+}
+
+.queen[data-queen="rainbow"] .queen-inner {
+  background: linear-gradient(135deg,
+      #FEE2E2 0%, #FEF3C7 20%, #D1FAE5 40%,
+      #DBEAFE 60%, #E0E7FF 80%, #FCE7F3 100%);
+  border-color: #A78BFA;
+}
+
+.queen[data-queen="heart"] .queen-inner {
+  background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+  border-color: #F87171;
+}
+
+.queen[data-queen="moon"] .queen-inner {
+  background: linear-gradient(135deg, #EDE9FE 0%, #DDD6FE 100%);
+  border-color: #8B5CF6;
+}
+
+.queen[data-queen="star"] .queen-inner {
+  background: linear-gradient(135deg, #FEF9C3 0%, #FDE047 100%);
+  border-color: #EAB308;
+}
+
+.queen[data-queen="cake"] .queen-inner {
+  background: linear-gradient(135deg, #FCE7F3 0%, #F9A8D4 100%);
+  border-color: #EC4899;
+}
+
+/* ============================================
+   Hand Container - Fan Layout
+   ============================================ */
+
+.hand {
+  display: flex;
+  gap: 10px;
+  padding: 16px;
+  overflow-x: auto;
+  justify-content: center;
+  flex-wrap: wrap;
+  min-height: calc(var(--card-height) + 40px);
+}
+
+.hand::-webkit-scrollbar {
+  height: 6px;
+}
+
+.hand::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+}
+
+.hand::-webkit-scrollbar-thumb {
+  background: var(--primary-light);
+  border-radius: 3px;
+}
+
+/* ============================================
+   Queens Grid - Magical Layout
+   ============================================ */
+
+.queens-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 16px;
+  justify-items: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+@media (max-width: 600px) {
+  .queens-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+}

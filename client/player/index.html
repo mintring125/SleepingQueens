@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sleeping Queens - Player</title>
+  <link rel="stylesheet" href="/shared/styles/common.css">
+  <link rel="stylesheet" href="/shared/styles/cards.css">
+  <link rel="stylesheet" href="/shared/styles/animations.css">
+  <link rel="stylesheet" href="/player/player.css">
+</head>
+<body>
+  <div class="connection-status" id="connectionStatus"></div>
+
+  <div class="container">
+    <div class="header">
+      <h1 id="playerHeader">Sleeping Queens</h1>
+      <div class="status-bar">
+        <span id="turnInfo">대기 중...</span>
+        <span id="scoreInfo">점수: 0</span>
+      </div>
+      <div class="timer-bar" id="timerBar">
+        <div class="timer-bar-fill" id="timerFill"></div>
+      </div>
+    </div>
+
+    <!-- Waiting screen -->
+    <div id="waitingScreen" class="panel">
+      <h2>게임 시작을 기다리는 중...</h2>
+      <p id="waitingInfo">호스트가 게임을 시작하면 자동으로 진행됩니다.</p>
+    </div>
+
+    <!-- Game screen -->
+    <div id="gameScreen" class="hidden">
+      <!-- My Queens -->
+      <div class="panel my-queens-panel">
+        <h3>내 퀸 (<span id="myQueenCount">0</span>)</h3>
+        <div class="hand" id="myQueens"></div>
+      </div>
+
+      <!-- Hand -->
+      <div class="panel hand-panel">
+        <h3>내 카드</h3>
+        <div class="hand" id="myHand"></div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons" id="actionButtons">
+        <button class="primary" id="playCardBtn" onclick="playSelectedCard()" disabled>카드 사용</button>
+        <button class="primary" id="discardBtn" onclick="discardSelected()" disabled>버리기</button>
+      </div>
+
+      <!-- Target Selection Modal -->
+      <div class="modal hidden" id="targetModal">
+        <div class="modal-content panel">
+          <h3 id="targetTitle">대상 선택</h3>
+          <div id="targetOptions" class="target-options"></div>
+          <button class="danger" onclick="closeTargetModal()">취소</button>
+        </div>
+      </div>
+
+      <!-- Counter Action Modal -->
+      <div class="modal hidden" id="counterModal">
+        <div class="modal-content panel counter-flash">
+          <h3 id="counterTitle">반격 기회!</h3>
+          <p id="counterMessage"></p>
+          <div class="counter-buttons">
+            <button class="success" id="counterBtn" onclick="useCounter()">반격</button>
+            <button class="danger" onclick="skipCounter()">포기</button>
+          </div>
+          <div class="timer-bar">
+            <div class="timer-bar-fill" id="counterTimerFill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- End screen -->
+    <div id="endScreen" class="hidden">
+      <div class="panel end-panel">
+        <h2 id="endTitle">게임 종료!</h2>
+        <div id="endResult"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/shared/socket.js"></script>
+  <script src="/shared/cards.js"></script>
+  <script src="/player/player.js"></script>
+</body>
+</html>

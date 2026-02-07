@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sleeping Queens - Table</title>
+  <link rel="stylesheet" href="/shared/styles/common.css">
+  <link rel="stylesheet" href="/shared/styles/cards.css">
+  <link rel="stylesheet" href="/shared/styles/animations.css">
+  <link rel="stylesheet" href="/table/table.css">
+</head>
+
+<body>
+  <div class="connection-status" id="connectionStatus"></div>
+
+  <div class="container">
+    <div class="header">
+      <h1>Sleeping Queens</h1>
+      <p id="sessionInfo">세션 준비 중...</p>
+    </div>
+
+    <!-- Waiting Phase -->
+    <div id="waitingPhase">
+      <div class="panel" id="setupPanel">
+        <h2>게임 설정</h2>
+        <div class="setup-controls" style="flex-direction: column; align-items: center; gap: 15px;">
+          <div class="house-rule-option">
+            <label
+              style="font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
+              <input type="checkbox" id="houseRuleAllQueens" style="width: 20px; height: 20px;">
+              <span>하우스룰: 모든 퀸 깨우기 (12개)</span>
+            </label>
+          </div>
+          <button class="primary" id="createGameBtn" onclick="createGame()" style="width: 100%; max-width: 300px;">게임
+            만들기</button>
+        </div>
+
+        <div class="rules-summary panel" style="margin-top: 20px; font-size: 0.9em; text-align: left;">
+          <h3 style="text-align: center; margin-bottom: 10px;">📋 게임 규칙 요약</h3>
+          <ul style="line-height: 1.6; padding-left: 20px;">
+            <li><strong>목표:</strong> 퀸 5개 또는 50점 모으기 (4인: 4개 또는 40점)</li>
+            <li><strong>행동 (1가지 선택):</strong>
+              <ul>
+                <li><strong>왕:</strong> 잠자는 퀸 1명 깨우기</li>
+                <li><strong>기사:</strong> 상대방 퀸 1명 뺏기 (드래곤으로 방어)</li>
+                <li><strong>물약:</strong> 상대방 퀸 1명 재우기 (요술봉으로 방어)</li>
+                <li><strong>광대:</strong> 덱 맨 위 카드 뽑기 (숫자면 버리고 다시 뽑기, 퀸/액션이면 갖기)</li>
+                <li><strong>숫자 카드 버리기:</strong>
+                  <ul>
+                    <li>1장 버리고 1장 받기</li>
+                    <li>같은 숫자 2장 버리고 2장 받기</li>
+                    <li>더하기 식 (예: 2+3=5) 3장 이상 버리고 그만큼 받기</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>턴 종료 시 항상 5장이 되도록 채웁니다.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="panel hidden" id="qrPanel">
+        <h2>QR 코드로 참가하세요</h2>
+        <div class="qr-container">
+          <div id="qrCode"></div>
+          <p id="joinUrl" class="join-url"></p>
+        </div>
+        <div class="players-waiting" id="playersWaiting">
+          <h3>참가자 (<span id="playerCount">0</span>/4)</h3>
+          <ul id="playerList"></ul>
+        </div>
+        <button class="success hidden" id="startGameBtn" onclick="startGame()">게임 시작</button>
+      </div>
+    </div>
+
+    <!-- Playing Phase -->
+    <div id="playingPhase" class="hidden">
+      <div class="status-bar">
+        <span>턴: <strong id="currentTurnPlayer">-</strong></span>
+        <span id="turnPhaseDisplay">-</span>
+        <span>덱: <strong id="deckCount">0</strong></span>
+        <span id="winConditionDisplay" style="font-size: 0.9em; color: var(--gold-light);"></span>
+      </div>
+
+      <div class="timer-bar" id="timerBar">
+        <div class="timer-bar-fill" id="timerFill"></div>
+      </div>
+
+      <!-- Sleeping Queens Grid -->
+      <div class="panel">
+        <h3>잠자는 퀸들</h3>
+        <div class="queens-grid" id="sleepingQueensGrid"></div>
+      </div>
+
+      <!-- Players Summary -->
+      <div class="players-board" id="playersBoard"></div>
+
+      <!-- Action Log -->
+      <div class="panel action-log-panel">
+        <h3>게임 로그</h3>
+        <div class="action-log" id="actionLog"></div>
+      </div>
+    </div>
+
+    <!-- End Phase -->
+    <div id="endPhase" class="hidden">
+      <div class="panel end-panel">
+        <h2>게임 종료!</h2>
+        <div id="winnerDisplay" class="winner-display"></div>
+        <div id="finalScores" class="final-scores"></div>
+        <button class="primary" onclick="location.reload()">새 게임</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/shared/socket.js"></script>
+  <script src="/shared/cards.js"></script>
+  <script src="/table/table.js"></script>
+</body>
+
+</html>
