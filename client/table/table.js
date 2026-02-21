@@ -83,7 +83,7 @@ function showQRCode(joinUrl) {
     // Fallback: generate QR via canvas API or show URL
     const img = document.createElement('img');
     img.src = `${(window.ENV?.BACKEND_URL || '')}/api/qr?url=${encodeURIComponent(joinUrl)}`;
-    img.alt = 'QR Code';
+    img.alt = 'QR 코드';
     img.style.width = '200px';
     img.style.height = '200px';
     img.onerror = () => {
@@ -337,6 +337,7 @@ function showDiscardAnimation(data) {
   // Create card elements for animation
   for (let i = 0; i < cardCount; i++) {
     const cardData = cards[i] || { type: 'number', value: '?' };
+    const typeKo = { king: '왕', knight: '기사', potion: '물약', wand: '마법봉', dragon: '드래곤', number: '숫자' };
 
     const cardEl = document.createElement('div');
     cardEl.className = 'card number';
@@ -349,7 +350,7 @@ function showDiscardAnimation(data) {
     cardEl.innerHTML = `
       <div class="card-inner" style="background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%); border: 3px solid #7DD3FC; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <div class="card-emoji" style="font-size: 28px; font-weight: 800; color: #7C3AED;">${cardData.value || '?'}</div>
-        <div class="card-name" style="font-size: 9px; font-weight: 700; text-transform: uppercase;">${cardData.type}</div>
+        <div class="card-name" style="font-size: 9px; font-weight: 700;">${typeKo[cardData.type] || cardData.type}</div>
       </div>
     `;
 

@@ -4,78 +4,78 @@ const CARD_IMAGE_PATH = '/assets/images/cards/';
 
 const CardTypes = {
   king: {
-    name: 'King',
+    name: '왕',
     emoji: '👑',
     color: '#FFD700',
     image: 'king.png',
-    description: 'Wake a sleeping queen'
+    description: '잠든 퀸 깨우기'
   },
   knight: {
-    name: 'Knight',
+    name: '기사',
     emoji: '⚔️',
     color: '#4A90D9',
     image: 'knight.png',
-    description: 'Steal a queen from another player'
+    description: '상대방 퀸 빼앗기'
   },
   potion: {
-    name: 'Potion',
+    name: '물약',
     emoji: '🧪',
     color: '#9B7ED9',
     image: 'potion.png',
-    description: 'Put a queen back to sleep'
+    description: '퀸 재우기'
   },
   wand: {
-    name: 'Wand',
+    name: '마법봉',
     emoji: '✨',
     color: '#E91E63',
     image: 'wand.png',
-    description: 'Counter a sleeping potion'
+    description: '수면포션 방어'
   },
   dragon: {
-    name: 'Dragon',
+    name: '드래곤',
     emoji: '🐉',
     color: '#E86A33',
     image: 'dragon.png',
-    description: 'Counter a knight'
+    description: '기사 방어'
   },
   number: {
-    name: 'Number',
+    name: '숫자',
     emoji: '🔢',
     color: '#3498DB',
     image: null,
-    description: 'Discard to draw new cards'
+    description: '버리고 새 카드 받기'
   }
 };
 
 const QueenTypes = {
-  rose: { name: 'Rose Queen', points: 5, color: '#FF6B6B', image: 'queen_rose.png' },
-  cat: { name: 'Cat Queen', points: 15, color: '#6B2D5B', image: 'queen_cat.png' },
-  dog: { name: 'Dog Queen', points: 15, color: '#8B4513', image: 'queen_dog.png' },
-  pancake: { name: 'Pancake Queen', points: 15, color: '#F4A460', image: 'queen_pancake.png' },
-  sunflower: { name: 'Sunflower Queen', points: 10, color: '#FFD700', image: 'queen_sunflower.png' },
-  rainbow: { name: 'Rainbow Queen', points: 10, color: '#87CEEB', image: 'queen_rainbow.png' },
-  moon: { name: 'Moon Queen', points: 10, color: '#4169E1', image: 'queen_moon.png' },
-  starfish: { name: 'Starfish Queen', points: 5, color: '#FFD700', image: 'queen_starfish.png' },
-  heart: { name: 'Heart Queen', points: 20, color: '#DC143C', image: 'queen_heart.png' },
-  ladybug: { name: 'Ladybug Queen', points: 10, color: '#DC143C', image: 'queen_ladybug.png' },
-  cake: { name: 'Cake Queen', points: 5, color: '#98FB98', image: 'queen_cake.png' },
-  peacock: { name: 'Peacock Queen', points: 15, color: '#20B2AA', image: 'queen_peacock.png' }
+  rose: { name: '장미 여왕', points: 5, color: '#FF6B6B', image: 'queen_rose.png' },
+  cat: { name: '고양이 여왕', points: 15, color: '#6B2D5B', image: 'queen_cat.png' },
+  dog: { name: '강아지 여왕', points: 15, color: '#8B4513', image: 'queen_dog.png' },
+  pancake: { name: '팬케이크 여왕', points: 15, color: '#F4A460', image: 'queen_pancake.png' },
+  sunflower: { name: '해바라기 여왕', points: 10, color: '#FFD700', image: 'queen_sunflower.png' },
+  rainbow: { name: '무지개 여왕', points: 10, color: '#87CEEB', image: 'queen_rainbow.png' },
+  moon: { name: '달 여왕', points: 10, color: '#4169E1', image: 'queen_moon.png' },
+  starfish: { name: '불가사리 여왕', points: 5, color: '#FFD700', image: 'queen_starfish.png' },
+  heart: { name: '하트 여왕', points: 20, color: '#DC143C', image: 'queen_heart.png' },
+  ladybug: { name: '무당벌레 여왕', points: 10, color: '#DC143C', image: 'queen_ladybug.png' },
+  cake: { name: '케이크 여왕', points: 5, color: '#98FB98', image: 'queen_cake.png' },
+  peacock: { name: '공작 여왕', points: 15, color: '#20B2AA', image: 'queen_peacock.png' }
 };
 
 // Fallback emoji display
 const QueenDisplay = {
-  rose: { name: 'Rose Queen', emoji: '🌹', color: '#FF6B6B' },
-  cat: { name: 'Cat Queen', emoji: '🐱', color: '#6B2D5B' },
-  dog: { name: 'Dog Queen', emoji: '🐶', color: '#8B4513' },
-  pancake: { name: 'Pancake Queen', emoji: '🥞', color: '#F4A460' },
-  sunflower: { name: 'Sunflower Queen', emoji: '🌻', color: '#FFD700' },
-  rainbow: { name: 'Rainbow Queen', emoji: '🌈', color: '#87CEEB' },
-  moon: { name: 'Moon Queen', emoji: '🌙', color: '#4169E1' },
-  starfish: { name: 'Starfish Queen', emoji: '⭐', color: '#FFD700' },
-  heart: { name: 'Heart Queen', emoji: '❤️', color: '#DC143C' },
-  ladybug: { name: 'Ladybug Queen', emoji: '🐞', color: '#DC143C' },
-  cake: { name: 'Cake Queen', emoji: '🎂', color: '#98FB98' },
-  peacock: { name: 'Peacock Queen', emoji: '🦚', color: '#20B2AA' },
+  rose: { name: '장미 여왕', emoji: '🌹', color: '#FF6B6B' },
+  cat: { name: '고양이 여왕', emoji: '🐱', color: '#6B2D5B' },
+  dog: { name: '강아지 여왕', emoji: '🐶', color: '#8B4513' },
+  pancake: { name: '팬케이크 여왕', emoji: '🥞', color: '#F4A460' },
+  sunflower: { name: '해바라기 여왕', emoji: '🌻', color: '#FFD700' },
+  rainbow: { name: '무지개 여왕', emoji: '🌈', color: '#87CEEB' },
+  moon: { name: '달 여왕', emoji: '🌙', color: '#4169E1' },
+  starfish: { name: '불가사리 여왕', emoji: '⭐', color: '#FFD700' },
+  heart: { name: '하트 여왕', emoji: '❤️', color: '#DC143C' },
+  ladybug: { name: '무당벌레 여왕', emoji: '🐞', color: '#DC143C' },
+  cake: { name: '케이크 여왕', emoji: '🎂', color: '#98FB98' },
+  peacock: { name: '공작 여왕', emoji: '🦚', color: '#20B2AA' },
   default: { emoji: '👸', color: '#DDA0DD' }
 };
 
@@ -160,7 +160,7 @@ function createQueenElement(queen, options = {}) {
           <div class="queen-fallback" style="display:none;">
             <div class="queen-emoji">${display.emoji}</div>
             <div class="queen-name">${queen.name}</div>
-            <div class="queen-points">${queen.points}pts</div>
+            <div class="queen-points">${queen.points}점</div>
           </div>
         </div>
       `;
@@ -169,7 +169,7 @@ function createQueenElement(queen, options = {}) {
         <div class="queen-inner" style="background-color: ${display.color}20; border-color: ${display.color}">
           <div class="queen-emoji">${display.emoji}</div>
           <div class="queen-name">${queen.name}</div>
-          <div class="queen-points">${queen.points}pts</div>
+          <div class="queen-points">${queen.points}점</div>
         </div>
       `;
     }
