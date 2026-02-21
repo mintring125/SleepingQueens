@@ -7,7 +7,9 @@ services:
     startCommand: node index.js
     envVars:
       - key: FRONTEND_URL
-        value: https://sleeping-queens.vercel.app
+        value: https://sleeping-queens-hazel.vercel.app
+      - key: CORS_ORIGIN
+        value: https://sleeping-queens-hazel.vercel.app
       - key: PORT
         value: 3000
     healthCheckPath: /
