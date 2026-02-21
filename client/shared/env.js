@@ -15,7 +15,7 @@
   // Online: use injected env or fallback to Render URL
   const BACKEND_URL = isLocal
     ? `http://${_host}:3000`
-    : (window.__ENV__?.BACKEND_URL || 'https://sleeping-queens-server.onrender.com');
+    : (window.__ENV__?.BACKEND_URL || 'https://sleepingqueens-1w2r.onrender.com');
 
   window.ENV = { isLocal, BACKEND_URL };
 })();
