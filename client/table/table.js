@@ -82,7 +82,7 @@ function showQRCode(joinUrl) {
   } else {
     // Fallback: generate QR via canvas API or show URL
     const img = document.createElement('img');
-    img.src = `/api/qr?url=${encodeURIComponent(joinUrl)}`;
+    img.src = `${(window.ENV?.BACKEND_URL || '')}/api/qr?url=${encodeURIComponent(joinUrl)}`;
     img.alt = 'QR Code';
     img.style.width = '200px';
     img.style.height = '200px';
