@@ -188,24 +188,42 @@ class KaribaGameManager {
   // ── 테이블 슬롯 클릭 ─────────────────────────────────────────────
   handleTableSlotClicked(socket, data) {
     const session = this.findGameBySocket(socket.id);
-    if (!session) return;
+    if (!session) {
+      console.log(`[Kariba] handleTableSlotClicked: 세션을 찾을 수 없음 (socket.id: ${socket.id})`);
+      socket.emit('actionResult', { success: false, message: '게임 세션을 찾을 수 없습니다.' });
+      return;
+    }
     const { game, sessionId } = session;
 
-    if (!this.tableSessions.has(socket.id)) return;
-    if (game.phase !== 'playing') return;
+    if (!this.tableSessions.has(socket.id)) {
+      console.log(`[Kariba] handleTableSlotClicked: 테이블 호스트 아님 (socket.id: ${socket.id})`);
+      socket.emit('actionResult', { success: false, message: '테이블 호스트만 클릭할 수 있습니다.' });
+      return;
+    }
+    if (game.phase !== 'playing') {
+      console.log(`[Kariba] handleTableSlotClicked: 게임 진행 중 아님 (sessionId: ${sessionId}, phase: ${game.phase})`);
+      socket.emit('actionResult', { success: false, message: '게임 진행 중이 아닙니다.' });
+      return;
+    }
 
     const cur = game.getCurrentPlayer();
-    if (!cur.prepared || !cur.prepared.cardType) return;
+    if (!cur.prepared || !cur.prepared.cardType) {
+      console.log(`[Kariba] handleTableSlotClicked: 플레이어 카드 준비 안됨 (playerId: ${cur.id}, playerName: ${cur.name})`);
+      socket.emit('actionResult', { success: false, message: `${cur.name}님이 플레이어 화면에서 카드를 아직 선택하지 않았습니다.` });
+      return;
+    }
 
     const slotType = parseInt(data.slotType);
     if (slotType !== cur.prepared.cardType) {
-      socket.emit('actionResult', { success: false, message: '선택한 카드와 다른 동물 칸입니다.' });
+      console.log(`[Kariba] handleTableSlotClicked: 슬롯 타입 불일치 (playerId: ${cur.id}, prepared: ${cur.prepared.cardType}, clicked: ${slotType})`);
+      socket.emit('actionResult', { success: false, message: `선택한 카드(${cur.prepared.cardType}번)와 다른 동물 칸(${slotType}번)입니다.` });
       return;
     }
 
     const { cardType, count } = cur.prepared;
     const result = game.playCards(cur.id, cardType, count);
     if (!result.success) {
+      console.log(`[Kariba] handleTableSlotClicked: playCards 실패 (playerId: ${cur.id}, cardType: ${cardType}, count: ${count}, message: ${result.message})`);
       socket.emit('actionResult', { success: false, message: result.message });
       return;
     }

@@ -68,7 +68,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   karibaSocket.on('actionResult', (data) => {
-    if (data.message) addLog(data.message);
+    if (data.message) {
+      addLog(data.message, data.success ? '' : 'special');
+      if (!data.success) {
+        showToast(data.message, 'error');
+      }
+    }
   });
 
   karibaSocket.on('restartStatus', (data) => {
@@ -119,6 +124,13 @@ function buildWateringHole() {
     slot.id = `slot-${type}`;
     slot.style.cursor = 'pointer';
     slot.onclick = () => {
+      // 터치 시각 피드백
+      slot.style.transform = `rotate(${type * 45 - 45}deg) translateY(-205px) scale(0.9)`;
+      setTimeout(() => {
+        slot.style.transform = `rotate(${type * 45 - 45}deg) translateY(-205px) scale(1)`;
+      }, 150);
+
+      console.log(`[Slot Clicked] Type: ${type}`);
       karibaSocket.emit('tableSlotClicked', { slotType: type });
     };
     board.appendChild(slot);
@@ -294,7 +306,6 @@ function animateFlyingCards(data) {
     // Trigger flying
     setTimeout(() => {
       flyingImg.style.transform = `translate(${endRect.left - startRect.left}px, ${endRect.top - startRect.top}px) scale(0.8) rotate(${Math.random() * 20 - 10}deg)`;
-      flyingImg.style.opacity = '0';
       setTimeout(() => flyingImg.remove(), 450);
     }, i * 150 + 50);
   }
