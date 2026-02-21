@@ -16,9 +16,10 @@
   const envBackendUrl = window.__ENV__?.BACKEND_URL;
   const onlineFallbacks = [
     envBackendUrl,
-    // Render service URL candidates (old/new)
-    'https://sleeping-queens-server.onrender.com',
-    'https://sleepingqueens-1w2r.onrender.com'
+    // Render service URL (primary)
+    'https://sleepingqueens-1w2r.onrender.com',
+    // legacy fallback
+    'https://sleeping-queens-server.onrender.com'
   ].filter(Boolean);
 
   // If frontend itself is served on Render, try same-origin backend first.

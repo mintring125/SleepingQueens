@@ -7,10 +7,19 @@ class KaribaSocketManager {
     this.playerId = null;
     this.sessionId = null;
     this.pendingEmits = [];
+    this.backendUrls = [];
+    this.currentBackendIndex = 0;
   }
 
   connect() {
-    const backendUrl = window.ENV?.BACKEND_URL || window.location.origin;
+    const configuredUrls = window.ENV?.BACKEND_URLS || [];
+    const fallbackUrl = window.ENV?.BACKEND_URL || window.location.origin;
+    this.backendUrls = (configuredUrls.length > 0 ? configuredUrls : [fallbackUrl]).filter(Boolean);
+    this.currentBackendIndex = 0;
+    return this._connectTo(this.backendUrls[0]);
+  }
+
+  _connectTo(backendUrl) {
     const namespaceUrl = backendUrl.replace(/\/$/, '') + '/kariba';
 
     if (this.socket) this.socket.disconnect();
@@ -18,7 +27,7 @@ class KaribaSocketManager {
     this.socket = io(namespaceUrl, {
       reconnection: true,
       reconnectionDelay: 1000,
-      reconnectionAttempts: 15
+      reconnectionAttempts: 10
     });
 
     Object.entries(this.handlers).forEach(([event, cb]) => {
@@ -28,13 +37,22 @@ class KaribaSocketManager {
     this.socket.on('connect', () => {
       this.connected = true;
       this.playerId = this.socket.id;
-      console.log('[Kariba] 연결됨:', this.socket.id);
+      console.log('[Kariba] 연결됨:', this.socket.id, 'via', backendUrl);
       this._flushPending();
     });
 
     this.socket.on('disconnect', () => {
       this.connected = false;
       console.log('[Kariba] 연결 끊김');
+    });
+
+    this.socket.on('connect_error', () => {
+      if (this.connected) return;
+      if (this.currentBackendIndex >= this.backendUrls.length - 1) return;
+      this.currentBackendIndex += 1;
+      const nextUrl = this.backendUrls[this.currentBackendIndex];
+      console.warn('[Kariba] 연결 실패, 다음 서버 시도:', nextUrl);
+      this._connectTo(nextUrl);
     });
 
     return this.socket;
