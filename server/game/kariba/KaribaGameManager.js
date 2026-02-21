@@ -71,6 +71,31 @@ class KaribaGameManager {
       return;
     }
     if (game.phase !== 'waiting') {
+      if (game.phase === 'ended') {
+        const existing = game.getPlayerByName(playerName);
+        if (existing) {
+          this.playerSessions.delete(existing.id);
+          existing.id = socket.id;
+          existing.connected = true;
+          this.playerSessions.set(socket.id, { sessionId, playerName });
+          socket.join(sessionId);
+
+          socket.emit('joinResult', { success: true, playerId: socket.id, playerName, sessionId });
+          socket.emit('gameState', game.getPublicState());
+          socket.emit('playerHand', { cards: existing.hand });
+          const winner = KaribaRules.getWinner(game.players);
+          socket.emit('gameEnd', {
+            winnerId: winner?.id,
+            winnerName: winner?.name,
+            scores: KaribaRules.getScores(game.players)
+          });
+
+          this._broadcastState(sessionId);
+          console.log(`[Kariba] 종료 게임 재입장 허용: ${playerName} → ${sessionId}`);
+          return;
+        }
+      }
+
       socket.emit('joinResult', { success: false, message: '이미 시작된 게임입니다' });
       return;
     }
@@ -281,6 +306,13 @@ class KaribaGameManager {
       if (game.phase === 'playing') {
         const cur = game.getCurrentPlayer();
         socket.emit('turnStart', { playerId: cur.id, playerName: cur.name });
+      } else if (game.phase === 'ended') {
+        const winner = KaribaRules.getWinner(game.players);
+        socket.emit('gameEnd', {
+          winnerId: winner?.id,
+          winnerName: winner?.name,
+          scores: KaribaRules.getScores(game.players)
+        });
       }
       this._broadcastState(sessionId);
       console.log(`[Kariba] ${playerName} 재접속 → ${sessionId}`);

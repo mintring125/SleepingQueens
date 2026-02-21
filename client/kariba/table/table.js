@@ -12,6 +12,11 @@ const ANIMALS = {
 };
 
 let gameState = null;
+let reconnectQrSessionId = null;
+
+function getSlotAngle(type) {
+  return ((1 - type) * 45 + 360) % 360;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   buildWateringHole();
@@ -124,10 +129,12 @@ function buildWateringHole() {
     slot.id = `slot-${type}`;
     slot.style.cursor = 'pointer';
     slot.onclick = () => {
+      const angle = getSlotAngle(type);
+
       // 터치 시각 피드백
-      slot.style.transform = `rotate(${type * 45 - 45}deg) translateY(-205px) scale(0.9)`;
+      slot.style.transform = `rotate(${angle}deg) translateY(-205px) scale(0.9)`;
       setTimeout(() => {
-        slot.style.transform = `rotate(${type * 45 - 45}deg) translateY(-205px) scale(1)`;
+        slot.style.transform = `rotate(${angle}deg) translateY(-205px) scale(1)`;
       }, 150);
 
       console.log(`[Slot Clicked] Type: ${type}`);
@@ -151,7 +158,7 @@ function buildWateringHole() {
 function updateDisplay() {
   if (!gameState) return;
 
-  const { phase, wateringHole, deckRemaining, players, currentPlayerId } = gameState;
+  const { phase, wateringHole, deckRemaining, players, currentPlayerId, sessionId } = gameState;
 
   if (phase === 'waiting') return;
 
@@ -159,6 +166,7 @@ function updateDisplay() {
   if (phase === 'playing' || phase === 'ended') {
     document.getElementById('waitingPhase').classList.add('hidden');
     document.getElementById('playingPhase').classList.remove('hidden');
+    renderReconnectQr(sessionId);
   }
 
   // 물웅덩이 슬롯 업데이트
@@ -203,6 +211,26 @@ function updateDisplay() {
 
   // 플레이어 보드
   renderPlayersBoard(players, currentPlayerId);
+}
+
+function renderReconnectQr(sessionId) {
+  const qrEl = document.getElementById('reconnectQrSmall');
+  const urlEl = document.getElementById('reconnectUrlSmall');
+  if (!qrEl || !urlEl || !sessionId) return;
+
+  const joinUrl = `${window.location.origin}/kariba/player/join.html?session=${sessionId}`;
+  urlEl.textContent = joinUrl;
+
+  if (reconnectQrSessionId === sessionId && qrEl.childElementCount > 0) return;
+
+  qrEl.innerHTML = '';
+  new QRCode(qrEl, {
+    text: joinUrl,
+    width: 88,
+    height: 88,
+    correctLevel: QRCode.CorrectLevel.M
+  });
+  reconnectQrSessionId = sessionId;
 }
 
 function renderPlayersBoard(players, currentPlayerId) {

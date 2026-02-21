@@ -149,15 +149,15 @@ body::after {
 }
 
 .slot-2 {
-  transform: rotate(45deg) translateY(-205px);
+  transform: rotate(315deg) translateY(-205px);
 }
 
 .slot-3 {
-  transform: rotate(90deg) translateY(-205px);
+  transform: rotate(270deg) translateY(-205px);
 }
 
 .slot-4 {
-  transform: rotate(135deg) translateY(-205px);
+  transform: rotate(225deg) translateY(-205px);
 }
 
 .slot-5 {
@@ -165,15 +165,15 @@ body::after {
 }
 
 .slot-6 {
-  transform: rotate(225deg) translateY(-205px);
+  transform: rotate(135deg) translateY(-205px);
 }
 
 .slot-7 {
-  transform: rotate(270deg) translateY(-205px);
+  transform: rotate(90deg) translateY(-205px);
 }
 
 .slot-8 {
-  transform: rotate(315deg) translateY(-205px);
+  transform: rotate(45deg) translateY(-205px);
 }
 
 /* 중앙 덱 */
@@ -554,15 +554,15 @@ body::after {
   }
 
   .slot-2 {
-    transform: rotate(45deg) translateY(-130px);
+    transform: rotate(315deg) translateY(-130px);
   }
 
   .slot-3 {
-    transform: rotate(90deg) translateY(-130px);
+    transform: rotate(270deg) translateY(-130px);
   }
 
   .slot-4 {
-    transform: rotate(135deg) translateY(-130px);
+    transform: rotate(225deg) translateY(-130px);
   }
 
   .slot-5 {
@@ -570,18 +570,58 @@ body::after {
   }
 
   .slot-6 {
-    transform: rotate(225deg) translateY(-130px);
+    transform: rotate(135deg) translateY(-130px);
   }
 
   .slot-7 {
-    transform: rotate(270deg) translateY(-130px);
+    transform: rotate(90deg) translateY(-130px);
   }
 
   .slot-8 {
-    transform: rotate(315deg) translateY(-130px);
+    transform: rotate(45deg) translateY(-130px);
   }
 }
 
 .rules-panel {
   font-size: 0.88em;
+}
+
+.reconnect-mini {
+  margin: 12px auto 0;
+  width: fit-content;
+  text-align: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.reconnect-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.reconnect-qr {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto;
+}
+
+.reconnect-qr canvas,
+.reconnect-qr img {
+  width: 88px !important;
+  height: 88px !important;
+  border-radius: 6px;
+  background: white;
+  padding: 4px;
+}
+
+.reconnect-url {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: var(--text-secondary);
+  word-break: break-all;
+  max-width: 260px;
 }

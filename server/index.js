@@ -46,6 +46,7 @@ app.use('/lib/qrcode', express.static(path.join(__dirname, 'node_modules', 'qrco
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, '..', 'client', 'index.html')));
 app.get('/join', (req, res) => res.redirect('/player/join.html'));
 app.get('/kariba', (req, res) => res.redirect('/kariba/table'));
+app.get('/health', (req, res) => res.status(200).json({ ok: true }));
 
 // QR code API endpoint
 const QRCode = require('qrcode');
