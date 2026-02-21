@@ -48,7 +48,8 @@ class GameManager {
     socket.join(sessionId);
     this.tableSessions.set(socket.id, sessionId);
 
-    const joinUrl = `http://${this.localIP}:${this.port}/player/join.html?session=${sessionId}`;
+    const frontendBase = process.env.FRONTEND_URL || `http://${this.localIP}:${this.port}`;
+    const joinUrl = `${frontendBase}/player/join.html?session=${sessionId}`;
 
     // Generate QR code as data URL
     let qrDataUrl = '';
@@ -745,13 +746,12 @@ class GameManager {
     this.io.to(sessionId).emit('gameEnd', { winnerId, scores });
     this.broadcastGameState(sessionId);
 
-    // Record result to file
+    // Record result (file for local, console for Render/serverless)
     try {
       const date = new Date().toLocaleString();
       let resultText = `\n## Game ${sessionId} (${date})\n`;
       resultText += `- **Winner**: ${winner?.name || 'Unknown'}\n`;
       resultText += `- **Players**: ${game.players.length}\n`;
-      // Start time? We don't track it explicitly, but can infer duration if we had it. Keeping it simple.
 
       resultText += `\n### Final Standings\n`;
       scores.sort((a, b) => b.score - a.score).forEach((p, i) => {
@@ -761,10 +761,14 @@ class GameManager {
       });
       resultText += `\n---\n`;
 
-      // CWD is server/, so ../result.md is project root
-      fs.appendFileSync('../result.md', resultText);
+      // Try local file first; fall back to console (Render/Vercel compatible)
+      try {
+        fs.appendFileSync('../result.md', resultText);
+      } catch {
+        console.log('[GAME RESULT]', resultText);
+      }
     } catch (err) {
-      console.error('Failed to write result log:', err);
+      console.error('Failed to record result:', err);
     }
 
     console.log(`Game ${sessionId} ended. Winner: ${winner?.name}`);

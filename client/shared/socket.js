@@ -9,8 +9,9 @@ class SocketManager {
   }
 
   connect() {
-    // Connect to server (same host)
-    this.socket = io({
+    // Connect to backend - uses ENV for dual-mode (local LAN / online Render)
+    const backendUrl = window.ENV?.BACKEND_URL || window.location.origin;
+    this.socket = io(backendUrl, {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: 10

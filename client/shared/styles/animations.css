@@ -474,3 +474,91 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ============================================
+   Holographic Shift (for cards.css)
+   ============================================ */
+
+@keyframes holoShift {
+  0%   { background-position: 200% center; opacity: 0.6; }
+  50%  { opacity: 1; }
+  100% { background-position: -100% center; opacity: 0.6; }
+}
+
+/* ============================================
+   Enhanced Queen Wake Animation
+   ============================================ */
+
+@keyframes queenWakeEnhanced {
+  0% {
+    transform: scale(0.5) rotateY(180deg);
+    opacity: 0;
+    filter: blur(10px) brightness(0.5);
+  }
+  40% {
+    transform: scale(1.25) rotateY(0deg);
+    opacity: 1;
+    filter: blur(0) brightness(1.4);
+  }
+  65% { transform: scale(0.93) rotateY(0deg); filter: brightness(1.1); }
+  82% { transform: scale(1.07); }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+    opacity: 1;
+  }
+}
+
+.wake-animation-enhanced {
+  animation: queenWakeEnhanced 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ============================================
+   Star Twinkle (used by common.css body::after)
+   ============================================ */
+
+@keyframes twinkle {
+  0%   { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* ============================================
+   Magic Portal Entry (for join page)
+   ============================================ */
+
+@keyframes portalEntry {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+    filter: blur(20px);
+  }
+  60% {
+    transform: scale(1.1) rotate(5deg);
+    opacity: 1;
+    filter: blur(0);
+  }
+  80% { transform: scale(0.97) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+.portal-entry {
+  animation: portalEntry 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Spotlight pulse for current turn */
+@keyframes spotlightPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 0 rgba(245, 158, 11, 0),
+      0 0 20px rgba(245, 158, 11, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 0 6px rgba(245, 158, 11, 0.2),
+      0 0 40px rgba(245, 158, 11, 0.5);
+  }
+}
+
+.spotlight-pulse {
+  animation: spotlightPulse 1.8s ease-in-out infinite;
+}

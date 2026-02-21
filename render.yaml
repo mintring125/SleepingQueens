@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: sleeping-queens-server
+    env: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: FRONTEND_URL
+        value: https://sleeping-queens.vercel.app
+      - key: PORT
+        value: 3000
+    healthCheckPath: /

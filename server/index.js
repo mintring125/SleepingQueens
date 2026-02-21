@@ -7,8 +7,11 @@ const GameManager = require('./game/GameManager');
 
 const app = express();
 const server = http.createServer(app);
+const corsOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',')
+  : '*';
 const io = new Server(server, {
-  cors: { origin: '*' }
+  cors: { origin: corsOrigins, methods: ['GET', 'POST'] }
 });
 
 // Serve static files

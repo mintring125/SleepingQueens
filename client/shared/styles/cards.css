@@ -505,3 +505,43 @@
     gap: 12px;
   }
 }
+
+/* ============================================
+   Holographic Shimmer Effect (hover)
+   ============================================ */
+
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.12) 38%,
+    rgba(255, 255, 255, 0.28) 50%,
+    rgba(255, 255, 255, 0.12) 62%,
+    transparent 80%
+  );
+  border-radius: var(--radius-md);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.card:hover::after {
+  opacity: 1;
+  animation: holoShift 1.5s ease-in-out infinite;
+}
+
+/* Card 3D flip on deal */
+.card-flip-3d {
+  animation: cardFlip3D 0.6s ease-in-out;
+  transform-style: preserve-3d;
+}
+
+@keyframes cardFlip3D {
+  0%   { transform: perspective(600px) rotateY(0deg); }
+  50%  { transform: perspective(600px) rotateY(90deg); }
+  100% { transform: perspective(600px) rotateY(0deg); }
+}

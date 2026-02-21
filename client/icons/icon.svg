@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#4C1D95"/>
+    </linearGradient>
+    <linearGradient id="crown-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="text-glow" x="-10%" y="-30%" width="120%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Rounded background -->
+  <rect width="512" height="512" rx="114" fill="url(#bg)"/>
+
+  <!-- Subtle inner glow -->
+  <rect width="512" height="512" rx="114"
+        fill="none" stroke="rgba(167,139,250,0.3)" stroke-width="3"/>
+
+  <!-- Stars scattered -->
+  <circle cx="55"  cy="65"  r="2.5" fill="white" opacity="0.7"/>
+  <circle cx="130" cy="38"  r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="200" cy="55"  r="2"   fill="white" opacity="0.4"/>
+  <circle cx="440" cy="70"  r="2.5" fill="white" opacity="0.7"/>
+  <circle cx="475" cy="140" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="38"  cy="200" r="2"   fill="white" opacity="0.4"/>
+  <circle cx="490" cy="290" r="2.5" fill="white" opacity="0.6"/>
+  <circle cx="60"  cy="380" r="1.5" fill="white" opacity="0.4"/>
+  <circle cx="460" cy="420" r="2"   fill="white" opacity="0.5"/>
+  <circle cx="310" cy="42"  r="1.5" fill="white" opacity="0.6"/>
+
+  <!-- Crown body -->
+  <g transform="translate(256, 210)" filter="url(#glow)">
+    <!-- Crown shape -->
+    <polygon
+      points="-140,85 -140,-15 -85,40 0,-90 85,40 140,-15 140,85"
+      fill="url(#crown-grad)"
+      stroke="#D97706"
+      stroke-width="5"
+      stroke-linejoin="round"/>
+    <!-- Crown base band -->
+    <rect x="-140" y="80" width="280" height="22" rx="6"
+          fill="#F59E0B" stroke="#D97706" stroke-width="2"/>
+    <!-- Crown jewels -->
+    <circle cx="-85" cy="32"  r="16" fill="#EC4899" stroke="#BE185D" stroke-width="2"/>
+    <circle cx="0"   cy="-72" r="20" fill="#3B82F6" stroke="#1D4ED8" stroke-width="2"/>
+    <circle cx="85"  cy="32"  r="16" fill="#10B981" stroke="#047857" stroke-width="2"/>
+    <!-- Jewel shine highlights -->
+    <circle cx="-90" cy="27"  r="5"  fill="rgba(255,255,255,0.6)"/>
+    <circle cx="-4"  cy="-78" r="7"  fill="rgba(255,255,255,0.6)"/>
+    <circle cx="80"  cy="27"  r="5"  fill="rgba(255,255,255,0.6)"/>
+  </g>
+
+  <!-- Sleeping Z marks -->
+  <text x="372" y="168" font-size="64" font-weight="900" font-style="italic"
+        fill="rgba(255,255,255,0.55)" font-family="Georgia, 'Times New Roman', serif">Z</text>
+  <text x="418" y="118" font-size="40" font-weight="900" font-style="italic"
+        fill="rgba(255,255,255,0.35)" font-family="Georgia, 'Times New Roman', serif">z</text>
+
+  <!-- QUEENS text -->
+  <text x="256" y="432" text-anchor="middle"
+        font-size="50" font-weight="800" letter-spacing="7"
+        fill="white" font-family="Arial, Helvetica, sans-serif"
+        filter="url(#text-glow)">QUEENS</text>
+
+  <!-- Decorative sparkles -->
+  <text x="82"  y="430" font-size="28">✨</text>
+  <text x="376" y="430" font-size="28">✨</text>
+</svg>
