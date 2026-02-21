@@ -1,6 +1,7 @@
 {
   "outputDirectory": "client",
   "rewrites": [
+    { "source": "/", "destination": "/table/index.html" },
     { "source": "/table", "destination": "/table/index.html" },
     { "source": "/player", "destination": "/player/index.html" },
     { "source": "/player/join", "destination": "/player/join.html" },
