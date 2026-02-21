@@ -1,14 +1,14 @@
 // ── 카리바 테이블 컨트롤러 ───────────────────────────────────────
 
 const ANIMALS = {
-  1: { name: '생쥐',    emoji: '🐭', en: 'Mouse',    img: 'Kariba_1_Mouse_00001.png' },
-  2: { name: '미어캣',  emoji: '🦡', en: 'Meerkat',  img: 'Kariba_2_Meerkat_00001.png' },
-  3: { name: '얼룩말',  emoji: '🦓', en: 'Zebra',    img: 'Kariba_3_Zebra_00001.png' },
-  4: { name: '기린',    emoji: '🦒', en: 'Giraffe',  img: 'Kariba_4_Giraffe_00001.png' },
-  5: { name: '타조',    emoji: '🐦', en: 'Ostrich',  img: 'Kariba_5_Ostrich_00001.png' },
-  6: { name: '치타',    emoji: '🐆', en: 'Cheetah',  img: 'Kariba_6_Cheetah_00001.png' },
-  7: { name: '코뿔소',  emoji: '🦏', en: 'Rhino',    img: 'Kariba_7_Rhino_00001.png' },
-  8: { name: '코끼리',  emoji: '🐘', en: 'Elephant', img: 'Kariba_8_Elephant_00001.png' }
+  1: { name: '생쥐', emoji: '🐭', en: 'Mouse', img: 'Kariba_1_Mouse_00001.png' },
+  2: { name: '미어캣', emoji: '🦡', en: 'Meerkat', img: 'Kariba_2_Meerkat_00001.png' },
+  3: { name: '얼룩말', emoji: '🦓', en: 'Zebra', img: 'Kariba_3_Zebra_00001.png' },
+  4: { name: '기린', emoji: '🦒', en: 'Giraffe', img: 'Kariba_4_Giraffe_00001.png' },
+  5: { name: '타조', emoji: '🐦', en: 'Ostrich', img: 'Kariba_5_Ostrich_00001.png' },
+  6: { name: '치타', emoji: '🐆', en: 'Cheetah', img: 'Kariba_6_Cheetah_00001.png' },
+  7: { name: '코뿔소', emoji: '🦏', en: 'Rhino', img: 'Kariba_7_Rhino_00001.png' },
+  8: { name: '코끼리', emoji: '🐘', en: 'Elephant', img: 'Kariba_8_Elephant_00001.png' }
 };
 
 let gameState = null;
@@ -91,21 +91,9 @@ function buildWateringHole() {
   board.innerHTML = '';
 
   for (let type = 1; type <= 8; type++) {
-    const a = ANIMALS[type];
     const slot = document.createElement('div');
     slot.className = `animal-slot slot-${type}`;
     slot.id = `slot-${type}`;
-    slot.innerHTML = `
-      <img class="slot-img" src="/kariba/assets/images/${a.img}"
-           onerror="this.style.display='none';this.nextElementSibling.style.display='block'"
-           alt="${a.name}">
-      <span class="slot-emoji" style="display:none">${a.emoji}</span>
-      <div class="slot-count-row">
-        <span class="slot-count zero" id="count-${type}">0</span>
-      </div>
-      <div class="slot-name">${a.name}</div>
-      <div class="slot-num">${type}번</div>
-    `;
     board.appendChild(slot);
   }
 
@@ -137,10 +125,38 @@ function updateDisplay() {
   // 물웅덩이 슬롯 업데이트
   for (let type = 1; type <= 8; type++) {
     const count = (wateringHole[type] || []).length;
-    const countEl = document.getElementById(`count-${type}`);
-    if (countEl) {
-      countEl.textContent = count;
-      countEl.className = `slot-count ${count === 0 ? 'zero' : ''}`;
+    const slotEl = document.getElementById(`slot-${type}`);
+    if (slotEl) {
+      if (slotEl.dataset.count !== String(count)) {
+        slotEl.dataset.count = count;
+        slotEl.innerHTML = '';
+        if (count === 0) {
+          slotEl.innerHTML = `<div class="empty-placeholder">${type}</div>`;
+        } else {
+          const a = ANIMALS[type];
+          for (let i = 0; i < count; i++) {
+            const img = document.createElement('img');
+            img.src = `/kariba/assets/images/${a.img}`;
+            img.className = 'stacked-card';
+
+            // Generate slight random rotations and translations for stacked effect
+            const rotation = (Math.random() * 8 - 4).toFixed(1);
+            const tx = (Math.random() * 4 - 2).toFixed(1);
+            const ty = (Math.random() * 4 - 2).toFixed(1);
+
+            if (i === 0) {
+              img.style.transform = `rotate(0deg)`;
+            } else {
+              img.style.transform = `translate(${tx}px, ${ty}px) rotate(${rotation}deg)`;
+            }
+            img.style.zIndex = i + 1;
+
+            // Add fallback styling just in case image doesn't load immediately
+            img.onerror = () => { img.style.display = 'none'; };
+            slotEl.appendChild(img);
+          }
+        }
+      }
     }
   }
 
@@ -223,7 +239,7 @@ function showHuntAnimation(data) {
   const hunterSlot = document.getElementById(`slot-${data.hunterType}`);
   const huntedSlot = document.getElementById(`slot-${data.huntedType}`);
   if (hunterSlot) { hunterSlot.classList.add('hunting'); setTimeout(() => hunterSlot.classList.remove('hunting'), 1000); }
-  if (huntedSlot) { huntedSlot.classList.add('hunted');  setTimeout(() => huntedSlot.classList.remove('hunted'),  1000); }
+  if (huntedSlot) { huntedSlot.classList.add('hunted'); setTimeout(() => huntedSlot.classList.remove('hunted'), 1000); }
 
   const overlay = document.getElementById('huntOverlay');
   overlay.classList.remove('hidden');

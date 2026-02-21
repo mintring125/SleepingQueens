@@ -1,0 +1,7 @@
+{
+  "tool_name": "WebFetch",
+  "tool_input_preview": "{\"url\":\"https://sleeping-queens-server.onrender.com/api/qr?url=test\",\"prompt\":\"서버가 응답하는지, 어떤 응답인지 확인\"}",
+  "error": "Request failed with status code 404",
+  "timestamp": "2026-02-21T12:20:41.107Z",
+  "retry_count": 2
+}

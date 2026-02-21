@@ -1,0 +1,256 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1771654886938,
+  "projectRoot": "D:\\TableGame",
+  "techStack": {
+    "languages": [],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "assets"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "assets": {
+      "path": "assets",
+      "purpose": "Static assets",
+      "fileCount": 0,
+      "lastAccessed": 1771654886910,
+      "keyFiles": []
+    },
+    "client": {
+      "path": "client",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1771654886911,
+      "keyFiles": []
+    },
+    "server": {
+      "path": "server",
+      "purpose": null,
+      "fileCount": 3,
+      "lastAccessed": 1771654886911,
+      "keyFiles": [
+        "index.js",
+        "package-lock.json",
+        "package.json"
+      ]
+    },
+    "server\\node_modules": {
+      "path": "server\\node_modules",
+      "purpose": "Dependencies",
+      "fileCount": 1,
+      "lastAccessed": 1771654886913,
+      "keyFiles": []
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "client\\shared\\styles\\common.css",
+      "accessCount": 9,
+      "lastAccessed": 1771676266514,
+      "type": "file"
+    },
+    {
+      "path": "vercel.json",
+      "accessCount": 7,
+      "lastAccessed": 1771676169602,
+      "type": "file"
+    },
+    {
+      "path": "server\\game\\GameManager.js",
+      "accessCount": 6,
+      "lastAccessed": 1771674583761,
+      "type": "file"
+    },
+    {
+      "path": "client\\table\\index.html",
+      "accessCount": 5,
+      "lastAccessed": 1771659295336,
+      "type": "file"
+    },
+    {
+      "path": "server\\index.js",
+      "accessCount": 5,
+      "lastAccessed": 1771676174516,
+      "type": "file"
+    },
+    {
+      "path": "client\\shared\\env.js",
+      "accessCount": 5,
+      "lastAccessed": 1771676499554,
+      "type": "file"
+    },
+    {
+      "path": "client\\player\\index.html",
+      "accessCount": 3,
+      "lastAccessed": 1771655484186,
+      "type": "file"
+    },
+    {
+      "path": "client\\player\\join.html",
+      "accessCount": 3,
+      "lastAccessed": 1771655489695,
+      "type": "file"
+    },
+    {
+      "path": "render.yaml",
+      "accessCount": 3,
+      "lastAccessed": 1771658940825,
+      "type": "file"
+    },
+    {
+      "path": "client\\table\\table.js",
+      "accessCount": 3,
+      "lastAccessed": 1771674493725,
+      "type": "file"
+    },
+    {
+      "path": "client\\shared\\socket.js",
+      "accessCount": 3,
+      "lastAccessed": 1771676478285,
+      "type": "file"
+    },
+    {
+      "path": "client\\shared\\styles\\cards.css",
+      "accessCount": 2,
+      "lastAccessed": 1771655530144,
+      "type": "file"
+    },
+    {
+      "path": "client\\shared\\styles\\animations.css",
+      "accessCount": 2,
+      "lastAccessed": 1771655539980,
+      "type": "file"
+    },
+    {
+      "path": "server\\game\\GameState.js",
+      "accessCount": 2,
+      "lastAccessed": 1771674496922,
+      "type": "file"
+    },
+    {
+      "path": "client\\index.html",
+      "accessCount": 2,
+      "lastAccessed": 1771676243136,
+      "type": "file"
+    },
+    {
+      "path": "client\\kariba\\shared\\kariba-socket.js",
+      "accessCount": 2,
+      "lastAccessed": 1771676514493,
+      "type": "file"
+    },
+    {
+      "path": "SLEEPING_QUEENS_PLAN.md",
+      "accessCount": 1,
+      "lastAccessed": 1771655136795,
+      "type": "file"
+    },
+    {
+      "path": "C:\\Users\\mintk\\.claude\\projects\\D--TableGame\\8cdfdb5d-6b59-4003-8511-ba7be0a0f506\\tool-results\\b67ac1a.txt",
+      "accessCount": 1,
+      "lastAccessed": 1771655149205,
+      "type": "file"
+    },
+    {
+      "path": "client\\manifest.json",
+      "accessCount": 1,
+      "lastAccessed": 1771655343339,
+      "type": "file"
+    },
+    {
+      "path": "client\\manifest-table.json",
+      "accessCount": 1,
+      "lastAccessed": 1771655345586,
+      "type": "file"
+    },
+    {
+      "path": "client\\icons\\icon.svg",
+      "accessCount": 1,
+      "lastAccessed": 1771655361513,
+      "type": "file"
+    },
+    {
+      "path": "client\\games.html",
+      "accessCount": 1,
+      "lastAccessed": 1771674397587,
+      "type": "file"
+    },
+    {
+      "path": "server\\game\\kariba\\KaribaGame.js",
+      "accessCount": 1,
+      "lastAccessed": 1771674400653,
+      "type": "file"
+    },
+    {
+      "path": "client\\kariba\\table\\table.js",
+      "accessCount": 1,
+      "lastAccessed": 1771674401210,
+      "type": "file"
+    },
+    {
+      "path": "client\\kariba\\player\\player.js",
+      "accessCount": 1,
+      "lastAccessed": 1771674401487,
+      "type": "file"
+    },
+    {
+      "path": "server\\game\\kariba\\KaribaGameManager.js",
+      "accessCount": 1,
+      "lastAccessed": 1771674404699,
+      "type": "file"
+    },
+    {
+      "path": "server\\game\\kariba\\KaribaRules.js",
+      "accessCount": 1,
+      "lastAccessed": 1771674405131,
+      "type": "file"
+    },
+    {
+      "path": "server\\game\\kariba\\KaribaDeck.js",
+      "accessCount": 1,
+      "lastAccessed": 1771674409091,
+      "type": "file"
+    },
+    {
+      "path": "client\\kariba\\table\\index.html",
+      "accessCount": 1,
+      "lastAccessed": 1771674409538,
+      "type": "file"
+    },
+    {
+      "path": "client\\kariba\\player\\join.html",
+      "accessCount": 1,
+      "lastAccessed": 1771674409912,
+      "type": "file"
+    },
+    {
+      "path": "server\\game\\GameRules.js",
+      "accessCount": 1,
+      "lastAccessed": 1771674497202,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}
