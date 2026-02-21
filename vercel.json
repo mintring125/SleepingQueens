@@ -14,7 +14,7 @@
     { "source": "/kariba/table", "destination": "/client/kariba/table/index.html" },
     { "source": "/kariba/player", "destination": "/client/kariba/player/index.html" },
     { "source": "/kariba", "destination": "/client/kariba/table/index.html" },
-    { "source": "/", "destination": "/client/games.html" },
+    { "source": "/", "destination": "/client/index.html" },
     { "source": "/table", "destination": "/client/table/index.html" },
     { "source": "/player", "destination": "/client/player/index.html" },
     { "source": "/player/join", "destination": "/client/player/join.html" },

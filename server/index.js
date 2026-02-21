@@ -43,7 +43,7 @@ app.use('/kariba/assets', express.static(path.join(__dirname, '..', 'client', 'k
 app.use('/lib/qrcode', express.static(path.join(__dirname, 'node_modules', 'qrcode', 'build')));
 
 // Routes
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, '..', 'client', 'games.html')));
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, '..', 'client', 'index.html')));
 app.get('/join', (req, res) => res.redirect('/player/join.html'));
 app.get('/kariba', (req, res) => res.redirect('/kariba/table'));
 
