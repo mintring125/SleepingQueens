@@ -94,6 +94,25 @@ function buildWateringHole() {
   const board = document.getElementById('wateringHole');
   board.innerHTML = '';
 
+  // SVG 물웅덩이 배경
+  const svgBg = document.createElement('div');
+  svgBg.className = 'watering-hole-bg';
+  svgBg.innerHTML = `
+    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="waterGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.8" />
+          <stop offset="70%" stop-color="#0891b2" stop-opacity="0.6" />
+          <stop offset="100%" stop-color="#164e63" stop-opacity="0.1" />
+        </radialGradient>
+      </defs>
+      <!-- 물결 모형 패스 -->
+      <path fill="url(#waterGrad)" d="M200,35 C280,45 340,100 360,180 C375,260 310,360 200,370 C90,380 40,300 30,220 C20,130 90,25 200,35 Z" />
+      <path fill="rgba(255,255,255,0.1)" d="M200,60 C260,70 300,120 320,180 C330,240 280,310 200,320 C120,330 80,260 70,200 C60,130 130,50 200,60 Z" />
+    </svg>
+  `;
+  board.appendChild(svgBg);
+
   for (let type = 1; type <= 8; type++) {
     const slot = document.createElement('div');
     slot.className = `animal-slot slot-${type}`;

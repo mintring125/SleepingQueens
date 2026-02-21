@@ -50,6 +50,35 @@ body::after {
   margin: 0 auto;
 }
 
+/* 물웅덩이 SVG 배경 */
+.watering-hole-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 380px;
+  height: 380px;
+  z-index: 5;
+  pointer-events: none;
+  animation: wavePulse 8s ease-in-out infinite alternate;
+}
+
+.watering-hole-bg svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 20px rgba(6, 182, 212, 0.4));
+}
+
+@keyframes wavePulse {
+  from {
+    transform: translate(-50%, -50%) scale(0.98) rotate(0deg);
+  }
+
+  to {
+    transform: translate(-50%, -50%) scale(1.04) rotate(4deg);
+  }
+}
+
 /* 8개 슬롯 위치 (원형 배치) */
 .animal-slot {
   position: absolute;
@@ -497,6 +526,12 @@ body::after {
   .deck-center {
     width: 70px;
     height: 70px;
+  }
+
+  /* 모바일 물웅덩이 배경 크기 */
+  .watering-hole-bg {
+    width: 240px;
+    height: 240px;
   }
 
   .deck-center .deck-icon {
