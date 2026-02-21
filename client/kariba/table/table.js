@@ -139,15 +139,12 @@ function updateDisplay() {
             img.src = `/kariba/assets/images/${a.img}`;
             img.className = 'stacked-card';
 
-            // Generate slight random rotations and translations for stacked effect
-            const rotation = (Math.random() * 8 - 4).toFixed(1);
-            const tx = (Math.random() * 4 - 2).toFixed(1);
-            const ty = (Math.random() * 4 - 2).toFixed(1);
-
+            // Generate cascading stack effect so card numbers are visible
             if (i === 0) {
-              img.style.transform = `rotate(0deg)`;
+              img.style.transform = `translateY(0)`;
             } else {
-              img.style.transform = `translate(${tx}px, ${ty}px) rotate(${rotation}deg)`;
+              // Offset each card downwards by 25px
+              img.style.transform = `translateY(${i * 25}px)`;
             }
             img.style.zIndex = i + 1;
 

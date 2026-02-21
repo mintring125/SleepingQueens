@@ -1,22 +1,22 @@
 // ── 카리바 플레이어 컨트롤러 ─────────────────────────────────────
 
 const ANIMALS = {
-  1: { name: '생쥐',   emoji: '🐭', img: 'Kariba_1_Mouse_00001.png' },
+  1: { name: '생쥐', emoji: '🐭', img: 'Kariba_1_Mouse_00001.png' },
   2: { name: '미어캣', emoji: '🦡', img: 'Kariba_2_Meerkat_00001.png' },
   3: { name: '얼룩말', emoji: '🦓', img: 'Kariba_3_Zebra_00001.png' },
-  4: { name: '기린',   emoji: '🦒', img: 'Kariba_4_Giraffe_00001.png' },
-  5: { name: '타조',   emoji: '🐦', img: 'Kariba_5_Ostrich_00001.png' },
-  6: { name: '치타',   emoji: '🐆', img: 'Kariba_6_Cheetah_00001.png' },
+  4: { name: '기린', emoji: '🦒', img: 'Kariba_4_Giraffe_00001.png' },
+  5: { name: '타조', emoji: '🐦', img: 'Kariba_5_Ostrich_00001.png' },
+  6: { name: '치타', emoji: '🐆', img: 'Kariba_6_Cheetah_00001.png' },
   7: { name: '코뿔소', emoji: '🦏', img: 'Kariba_7_Rhino_00001.png' },
   8: { name: '코끼리', emoji: '🐘', img: 'Kariba_8_Elephant_00001.png' }
 };
 
-let gameState   = null;
-let myHand      = [];
+let gameState = null;
+let myHand = [];
 let selectedType = null;   // 선택된 카드 타입 (1~8)
 let selectedCount = 1;     // 내려놓을 장수
-let isMyTurn    = false;
-const sessionId  = localStorage.getItem('kariba_sessionId');
+let isMyTurn = false;
+const sessionId = localStorage.getItem('kariba_sessionId');
 const playerName = localStorage.getItem('kariba_playerName');
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -112,7 +112,7 @@ function updateDisplay() {
 
   // 덱 / 손패 / 획득 정보
   document.getElementById('deckRemaining').textContent = deckRemaining ?? '-';
-  document.getElementById('myHandCount').textContent   = myHand.length;
+  document.getElementById('myHandCount').textContent = myHand.length;
 
   const me = players?.find(p => p.name === playerName);
   if (me) document.getElementById('myCollected').textContent = me.collectedCount;
@@ -131,27 +131,33 @@ function renderHand() {
     return;
   }
 
-  // 같은 타입끼리 그룹핑해서 표시
-  const groups = {};
-  myHand.forEach(c => { groups[c.type] = (groups[c.type] || 0) + 1; });
+  // 카드 타입 순으로 정렬
+  const sortedHand = [...myHand].sort((a, b) => a.type - b.type);
 
-  Object.entries(groups).sort(([a],[b]) => a-b).forEach(([typeStr, cnt]) => {
-    const type = parseInt(typeStr);
+  // 현재 선택된 타입의 카드를 렌더링할 때 카운팅할 변수
+  let renderedCountForSelectedType = 0;
+
+  sortedHand.forEach((c) => {
+    const type = c.type;
     const a = ANIMALS[type];
-    const isSelected = selectedType === type;
+
+    const isSelectedType = selectedType === type;
     const isDisabled = !isMyTurn || (selectedType !== null && selectedType !== type);
 
+    let isSelectedCard = false;
+    if (isSelectedType && renderedCountForSelectedType < selectedCount) {
+      isSelectedCard = true;
+      renderedCountForSelectedType++;
+    }
+
     const card = document.createElement('div');
-    card.className = `animal-card${isSelected ? ' selected' : ''}${isDisabled ? ' disabled' : ''}`;
+    card.className = `animal-card${isSelectedCard ? ' selected' : ''}${isDisabled ? ' disabled' : ''}`;
     card.onclick = () => toggleCard(type);
 
     card.innerHTML = `
       <img class="card-img" src="/kariba/assets/images/${a.img}"
-           onerror="this.style.display='none';this.nextElementSibling.style.display='block'"
+           onerror="this.style.display='none'"
            alt="${a.name}">
-      <span class="card-emoji" style="display:none">${a.emoji}</span>
-      <div class="card-name">${a.name}</div>
-      <div class="card-num">${type}번 · ${cnt}장</div>
     `;
 
     container.appendChild(card);
@@ -181,13 +187,13 @@ function changeCount(delta) {
   selectedCount = Math.max(1, Math.min(max, selectedCount + delta));
   document.getElementById('countDisplay').textContent = selectedCount;
   document.getElementById('countDown').disabled = selectedCount <= 1;
-  document.getElementById('countUp').disabled   = selectedCount >= max;
+  document.getElementById('countUp').disabled = selectedCount >= max;
 }
 
 // ── 액션 UI 업데이트 ──────────────────────────────────────────────
 function updateActionUI() {
-  const infoEl   = document.getElementById('selectedInfo');
-  const playBtn  = document.getElementById('playBtn');
+  const infoEl = document.getElementById('selectedInfo');
+  const playBtn = document.getElementById('playBtn');
   const countUpBtn = document.getElementById('countUp');
   const countDownBtn = document.getElementById('countDown');
 
@@ -210,7 +216,7 @@ function updateActionUI() {
   document.getElementById('countDisplay').textContent = selectedCount;
   playBtn.disabled = false;
   countDownBtn.disabled = selectedCount <= 1;
-  countUpBtn.disabled   = selectedCount >= max;
+  countUpBtn.disabled = selectedCount >= max;
 }
 
 // ── 카드 내려놓기 ─────────────────────────────────────────────────
