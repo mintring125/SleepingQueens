@@ -169,41 +169,30 @@ function toggleCard(type) {
   if (!isMyTurn) { showToast('당신의 차례가 아닙니다', 'error'); return; }
 
   if (selectedType === type) {
-    // 같은 타입 다시 누르면 해제
-    selectedType = null;
-    selectedCount = 1;
+    const max = myHand.filter(c => c.type === type).length;
+    if (selectedCount < max) {
+      selectedCount++;
+    } else {
+      selectedType = null;
+      selectedCount = 0;
+    }
   } else {
     selectedType = type;
     selectedCount = 1;
   }
-  renderHand();
-  updateActionUI();
-}
 
-// ── 수량 변경 ─────────────────────────────────────────────────────
-function changeCount(delta) {
-  if (selectedType === null) return;
-  const max = myHand.filter(c => c.type === selectedType).length;
-  selectedCount = Math.max(1, Math.min(max, selectedCount + delta));
-  document.getElementById('countDisplay').textContent = selectedCount;
-  document.getElementById('countDown').disabled = selectedCount <= 1;
-  document.getElementById('countUp').disabled = selectedCount >= max;
+  updateActionUI();
+  renderHand();
 }
 
 // ── 액션 UI 업데이트 ──────────────────────────────────────────────
 function updateActionUI() {
   const infoEl = document.getElementById('selectedInfo');
-  const playBtn = document.getElementById('playBtn');
-  const countUpBtn = document.getElementById('countUp');
-  const countDownBtn = document.getElementById('countDown');
 
   if (!isMyTurn || selectedType === null) {
-    infoEl.textContent = isMyTurn ? '카드를 선택하세요' : '상대방 턴...';
+    infoEl.textContent = isMyTurn ? '동물 카드를 선택하세요' : '상대방 턴...';
     infoEl.className = 'selected-info';
-    playBtn.disabled = true;
-    countUpBtn.disabled = true;
-    countDownBtn.disabled = true;
-    document.getElementById('countDisplay').textContent = '1';
+    karibaSocket.emit('prepareCards', { cardType: null, count: 0 });
     return;
   }
 
@@ -211,27 +200,10 @@ function updateActionUI() {
   const max = myHand.filter(c => c.type === selectedType).length;
   selectedCount = Math.min(selectedCount, max);
 
-  infoEl.textContent = `${a.emoji} ${a.name} ${selectedCount}장 선택`;
+  infoEl.textContent = `${a.emoji} ${a.name} ${selectedCount}장 선택완료!`;
   infoEl.className = 'selected-info has-selection';
-  document.getElementById('countDisplay').textContent = selectedCount;
-  playBtn.disabled = false;
-  countDownBtn.disabled = selectedCount <= 1;
-  countUpBtn.disabled = selectedCount >= max;
-}
 
-// ── 카드 내려놓기 ─────────────────────────────────────────────────
-function playCards() {
-  if (!isMyTurn || selectedType === null) return;
-
-  karibaSocket.emit('playCards', { cardType: selectedType, count: selectedCount });
-
-  // 낙관적 초기화
-  isMyTurn = false;
-  selectedType = null;
-  selectedCount = 1;
-  document.getElementById('turnInfo').textContent = '처리 중...';
-  document.getElementById('turnInfo').classList.remove('my-turn');
-  updateActionUI();
+  karibaSocket.emit('prepareCards', { cardType: selectedType, count: selectedCount });
 }
 
 // ── 물웅덩이 요약 ─────────────────────────────────────────────────

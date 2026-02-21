@@ -63,6 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
     showGameEnd(data);
   });
 
+  karibaSocket.on('cardsFlying', (data) => {
+    animateFlyingCards(data);
+  });
+
   karibaSocket.on('actionResult', (data) => {
     if (data.message) addLog(data.message);
   });
@@ -94,6 +98,10 @@ function buildWateringHole() {
     const slot = document.createElement('div');
     slot.className = `animal-slot slot-${type}`;
     slot.id = `slot-${type}`;
+    slot.style.cursor = 'pointer';
+    slot.onclick = () => {
+      karibaSocket.emit('tableSlotClicked', { slotType: type });
+    };
     board.appendChild(slot);
   }
 
@@ -171,7 +179,7 @@ function renderPlayersBoard(players, currentPlayerId) {
   if (!players || players.length === 0) { board.innerHTML = ''; return; }
 
   board.innerHTML = players.map(p => `
-    <div class="player-card ${p.id === currentPlayerId ? 'current-turn' : ''}">
+    <div class="player-card ${p.id === currentPlayerId ? 'current-turn' : ''}" data-player-id="${p.id}">
       <div class="player-name">${p.name}</div>
       <div class="player-stats">
         <div class="stat-item">
@@ -241,6 +249,36 @@ function showHuntAnimation(data) {
   const overlay = document.getElementById('huntOverlay');
   overlay.classList.remove('hidden');
   setTimeout(() => overlay.classList.add('hidden'), 2200);
+}
+
+// ── 카드 날아가는 애니메이션 ───────────────────────────────────────
+function animateFlyingCards(data) {
+  const { playerId, cardType, count } = data;
+  const playerCard = Array.from(document.querySelectorAll('.player-card')).find(el => el.dataset.playerId === playerId);
+  const targetSlot = document.getElementById(`slot-${cardType}`);
+
+  if (!playerCard || !targetSlot) return;
+
+  const startRect = playerCard.getBoundingClientRect();
+  const endRect = targetSlot.getBoundingClientRect();
+
+  for (let i = 0; i < count; i++) {
+    const flyingImg = document.createElement('img');
+    flyingImg.src = `/kariba/assets/images/${ANIMALS[cardType].img}`;
+    flyingImg.className = 'flying-card';
+    document.body.appendChild(flyingImg);
+
+    // Initial position
+    flyingImg.style.left = `${startRect.left + startRect.width / 2 - 30}px`;
+    flyingImg.style.top = `${startRect.top + startRect.height / 2 - 45}px`;
+
+    // Trigger flying
+    setTimeout(() => {
+      flyingImg.style.transform = `translate(${endRect.left - startRect.left}px, ${endRect.top - startRect.top}px) scale(0.8) rotate(${Math.random() * 20 - 10}deg)`;
+      flyingImg.style.opacity = '0';
+      setTimeout(() => flyingImg.remove(), 450);
+    }, i * 150 + 50);
+  }
 }
 
 // ── 게임 종료 화면 ─────────────────────────────────────────────────

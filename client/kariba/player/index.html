@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7,6 +8,7 @@
   <link rel="stylesheet" href="/shared/styles/common.css">
   <link rel="stylesheet" href="/kariba/player/player.css">
 </head>
+
 <body>
   <div class="connection-status" id="connectionStatus"></div>
 
@@ -44,14 +46,8 @@
         <!-- 액션 영역 -->
         <div class="action-area">
           <div class="selected-info" id="selectedInfo">카드를 선택하세요</div>
-
-          <div class="count-control">
-            <button class="count-btn" id="countDown" onclick="changeCount(-1)" disabled>－</button>
-            <span id="countDisplay">1</span>
-            <button class="count-btn" id="countUp" onclick="changeCount(1)" disabled>＋</button>
-          </div>
-
-          <button id="playBtn" onclick="playCards()" disabled>카드 내려놓기</button>
+          <p style="text-align:center; color:rgba(255,255,255,0.6); font-size:12px; margin-top:8px;">준비가 되면 테이블 화면에서 이
+            동물 칸을 터치하세요</p>
         </div>
 
         <!-- 게임 정보 -->
@@ -97,4 +93,5 @@
   <script src="/kariba/shared/kariba-socket.js"></script>
   <script src="/kariba/player/player.js"></script>
 </body>
+
 </html>

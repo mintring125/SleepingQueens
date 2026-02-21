@@ -25,13 +25,15 @@ class KaribaGameManager {
       console.log(`[Kariba] 연결: ${socket.id}`);
       socket.emit('serverInfo', { ip: this.localIP, port: this.port });
 
-      socket.on('createGame',      (data) => this.handleCreateGame(socket, data));
-      socket.on('joinGame',        (data) => this.handleJoinGame(socket, data));
-      socket.on('startGame',       ()     => this.handleStartGame(socket));
-      socket.on('playCards',       (data) => this.handlePlayCards(socket, data));
-      socket.on('rejoin',          (data) => this.handleRejoin(socket, data));
-      socket.on('requestRestart',  ()     => this.handleRequestRestart(socket));
-      socket.on('disconnect',      ()     => this.handleDisconnect(socket));
+      socket.on('createGame', (data) => this.handleCreateGame(socket, data));
+      socket.on('joinGame', (data) => this.handleJoinGame(socket, data));
+      socket.on('startGame', () => this.handleStartGame(socket));
+      socket.on('playCards', (data) => this.handlePlayCards(socket, data));
+      socket.on('prepareCards', (data) => this.handlePrepareCards(socket, data));
+      socket.on('tableSlotClicked', (data) => this.handleTableSlotClicked(socket, data));
+      socket.on('rejoin', (data) => this.handleRejoin(socket, data));
+      socket.on('requestRestart', () => this.handleRequestRestart(socket));
+      socket.on('disconnect', () => this.handleDisconnect(socket));
     });
   }
 
@@ -128,7 +130,7 @@ class KaribaGameManager {
     }
 
     const cardType = parseInt(data.cardType);
-    const count    = parseInt(data.count);
+    const count = parseInt(data.count);
 
     if (isNaN(cardType) || cardType < 1 || cardType > 8 || isNaN(count) || count < 1) {
       socket.emit('actionResult', { success: false, message: '유효하지 않은 요청입니다' });
@@ -150,14 +152,94 @@ class KaribaGameManager {
 
     if (result.gameOver) {
       this.io.to(sessionId).emit('gameEnd', {
-        winnerId:   result.winner?.id,
+        winnerId: result.winner?.id,
         winnerName: result.winner?.name,
-        scores:     result.scores
+        scores: result.scores
       });
       console.log(`[Kariba] 게임 종료 ${sessionId}. 승자: ${result.winner?.name}`);
     } else {
       const cur = game.getCurrentPlayer();
       this.io.to(sessionId).emit('turnStart', { playerId: cur.id, playerName: cur.name });
+    }
+  }
+
+  // ── 카드 준비 (플레이어) ──────────────────────────────────────────
+  handlePrepareCards(socket, data) {
+    const session = this.findGameBySocket(socket.id);
+    if (!session) return;
+    const { game, sessionId } = session;
+
+    const player = game.getPlayer(socket.id);
+    if (!player) return;
+
+    if (data.cardType === null) {
+      player.prepared = null;
+    } else {
+      player.prepared = { cardType: parseInt(data.cardType), count: parseInt(data.count) };
+    }
+
+    this.io.to(sessionId).emit('playerPrepared', {
+      playerId: player.id,
+      cardType: player.prepared?.cardType || null,
+      count: player.prepared?.count || 0
+    });
+  }
+
+  // ── 테이블 슬롯 클릭 ─────────────────────────────────────────────
+  handleTableSlotClicked(socket, data) {
+    const session = this.findGameBySocket(socket.id);
+    if (!session) return;
+    const { game, sessionId } = session;
+
+    if (!this.tableSessions.has(socket.id)) return;
+    if (game.phase !== 'playing') return;
+
+    const cur = game.getCurrentPlayer();
+    if (!cur.prepared || !cur.prepared.cardType) return;
+
+    const slotType = parseInt(data.slotType);
+    if (slotType !== cur.prepared.cardType) {
+      socket.emit('actionResult', { success: false, message: '선택한 카드와 다른 동물 칸입니다.' });
+      return;
+    }
+
+    const { cardType, count } = cur.prepared;
+    const result = game.playCards(cur.id, cardType, count);
+    if (!result.success) {
+      socket.emit('actionResult', { success: false, message: result.message });
+      return;
+    }
+
+    cur.prepared = null;
+
+    // Notify clients for flying animation
+    this.io.to(sessionId).emit('cardsFlying', {
+      playerId: cur.id,
+      cardType: cardType,
+      count: count
+    });
+
+    this._broadcastState(sessionId);
+    this._sendHands(sessionId);
+
+    if (result.huntResult) {
+      // Delay hunt animation slightly so flying can start
+      setTimeout(() => {
+        this.io.to(sessionId).emit('huntResult', result.huntResult);
+      }, 600);
+    }
+
+    if (result.gameOver) {
+      setTimeout(() => {
+        this.io.to(sessionId).emit('gameEnd', {
+          winnerId: result.winner?.id,
+          winnerName: result.winner?.name,
+          scores: result.scores
+        });
+      }, 1000);
+    } else {
+      const nextCur = game.getCurrentPlayer();
+      this.io.to(sessionId).emit('turnStart', { playerId: nextCur.id, playerName: nextCur.name });
     }
   }
 
@@ -198,7 +280,7 @@ class KaribaGameManager {
 
     game.restartRequests.add(player.id);
     const current = game.restartRequests.size;
-    const total   = game.players.length;
+    const total = game.players.length;
 
     this.io.to(sessionId).emit('restartStatus', { current, total });
     this.io.to(sessionId).emit('actionResult', {
