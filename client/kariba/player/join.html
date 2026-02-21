@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>카리바 - 참가</title>
+  <link rel="stylesheet" href="/shared/styles/common.css">
+  <link rel="stylesheet" href="/kariba/player/player.css">
+  <style>
+    .name-buttons { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin:16px 0; }
+    .name-btn {
+      padding:16px 28px; font-size:18px; font-weight:700;
+      border-radius:50px; border:3px solid transparent;
+      background:linear-gradient(135deg,#2d1a00,#3d2800);
+      color: var(--savanna-gold, #F59E0B); cursor:pointer;
+      transition: all 0.3s ease;
+    }
+    .name-btn:hover { transform:scale(1.05); box-shadow:0 4px 15px rgba(217,119,6,0.4); }
+    .name-btn.selected {
+      background:linear-gradient(135deg,#D97706,#F59E0B);
+      color:#1a0f00; border-color:#F59E0B;
+    }
+    .name-btn.add-btn {
+      background:linear-gradient(135deg,#1a3a1a,#1e4a1e);
+      color:#34d399; font-size:24px; padding:16px 24px;
+    }
+    .custom-name-input { display:none; margin-top:12px; }
+    .custom-name-input.show { display:block; }
+    .custom-name-row { display:flex; gap:8px; align-items:center; }
+    .custom-name-row input { flex:1; }
+    .header h1::before { content:'🦒 '; }
+    .header h1::after  { content:' 🦒'; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>카리바</h1>
+      <p>게임에 참가하세요</p>
+    </div>
+
+    <div class="panel join-panel">
+      <div id="manualSection">
+        <h2>세션 코드 입력</h2>
+        <input type="text" id="sessionInput" placeholder="세션 코드 (예: AB12CD)" class="input-field"
+               style="text-transform:uppercase;letter-spacing:3px;font-size:20px;text-align:center;">
+      </div>
+
+      <div class="name-section" style="margin-top:20px;">
+        <h2>이름 선택</h2>
+        <div class="name-buttons" id="nameButtons">
+          <button type="button" class="name-btn" data-name="김형석" onclick="selectName('김형석',this)">김형석</button>
+          <button type="button" class="name-btn" data-name="김나은" onclick="selectName('김나은',this)">김나은</button>
+          <button type="button" class="name-btn" data-name="김아림" onclick="selectName('김아림',this)">김아림</button>
+          <button type="button" class="name-btn add-btn" onclick="showCustomInput()">+</button>
+        </div>
+        <div id="customNameInput" class="custom-name-input">
+          <div class="custom-name-row">
+            <input type="text" id="customName" placeholder="새 이름 입력" class="input-field" maxlength="10">
+            <button class="primary" onclick="addCustomName()">추가</button>
+          </div>
+        </div>
+      </div>
+
+      <input type="hidden" id="nameInput" value="">
+
+      <button class="success join-btn" id="joinBtn" onclick="joinGame()"
+              style="width:100%;margin-top:20px;">참가하기</button>
+      <p id="joinMessage" style="margin-top:12px;text-align:center;font-weight:700;"></p>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+  <script src="/shared/env.js"></script>
+  <script src="/kariba/shared/kariba-socket.js"></script>
+  <script>
+    let selectedName = '';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      karibaSocket.connect();
+
+      // URL 파라미터에서 세션 코드 추출
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get('session');
+      if (sessionId) {
+        document.getElementById('sessionInput').value = sessionId.toUpperCase();
+        showMsg('세션 코드가 입력되었습니다!', 'success');
+      }
+
+      karibaSocket.on('joinResult', (data) => {
+        if (data.success) {
+          localStorage.setItem('kariba_playerId',   data.playerId);
+          localStorage.setItem('kariba_playerName', data.playerName);
+          localStorage.setItem('kariba_sessionId',  data.sessionId);
+          window.location.href = '/kariba/player/index.html?session=' + data.sessionId;
+        } else {
+          showMsg(data.message, 'error');
+        }
+      });
+    });
+
+    function selectName(name, btn) {
+      document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedName = name;
+      document.getElementById('nameInput').value = name;
+      document.getElementById('customNameInput').classList.remove('show');
+    }
+
+    function showCustomInput() {
+      document.getElementById('customNameInput').classList.toggle('show');
+      document.getElementById('customName').focus();
+    }
+
+    function addCustomName() {
+      const name = document.getElementById('customName').value.trim();
+      if (!name) { showMsg('이름을 입력하세요', 'error'); return; }
+      if (name.length > 10) { showMsg('이름은 10자 이하로 입력하세요', 'error'); return; }
+
+      const container = document.getElementById('nameButtons');
+      const addBtn = container.querySelector('.add-btn');
+      const newBtn = document.createElement('button');
+      newBtn.type = 'button';
+      newBtn.className = 'name-btn selected';
+      newBtn.dataset.name = name;
+      newBtn.textContent = name;
+      newBtn.onclick = function() { selectName(name, this); };
+      container.insertBefore(newBtn, addBtn);
+
+      document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
+      newBtn.classList.add('selected');
+      selectedName = name;
+      document.getElementById('nameInput').value = name;
+      document.getElementById('customName').value = '';
+      document.getElementById('customNameInput').classList.remove('show');
+      showMsg(`'${name}' 추가됨!`, 'success');
+    }
+
+    function joinGame() {
+      const sessionId = document.getElementById('sessionInput').value.trim().toUpperCase();
+      const name = selectedName || document.getElementById('nameInput').value.trim();
+      if (!sessionId) { showMsg('세션 코드를 입력하세요', 'error'); return; }
+      if (!name)      { showMsg('이름을 선택하세요', 'error'); return; }
+      karibaSocket.emit('joinGame', { sessionId, playerName: name });
+    }
+
+    function showMsg(text, type) {
+      const el = document.getElementById('joinMessage');
+      el.textContent = text;
+      el.style.color = type === 'error' ? '#f87171' : '#34d399';
+    }
+
+    // 입력창 대문자 변환
+    document.addEventListener('DOMContentLoaded', () => {
+      const inp = document.getElementById('sessionInput');
+      inp.addEventListener('input', () => { inp.value = inp.value.toUpperCase(); });
+    });
+  </script>
+</body>
+</html>

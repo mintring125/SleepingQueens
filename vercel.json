@@ -1,11 +1,17 @@
 {
-  "outputDirectory": "client",
   "rewrites": [
-    { "source": "/", "destination": "/table/index.html" },
-    { "source": "/table", "destination": "/table/index.html" },
-    { "source": "/player", "destination": "/player/index.html" },
-    { "source": "/player/join", "destination": "/player/join.html" },
-    { "source": "/join", "destination": "/player/join.html" }
+    { "source": "/manifest.json", "destination": "/client/manifest.json" },
+    { "source": "/manifest-table.json", "destination": "/client/manifest-table.json" },
+    { "source": "/icons/(.*)", "destination": "/client/icons/$1" },
+    { "source": "/assets/(.*)", "destination": "/client/assets/$1" },
+    { "source": "/shared/(.*)", "destination": "/client/shared/$1" },
+    { "source": "/table/(.*)", "destination": "/client/table/$1" },
+    { "source": "/player/(.*)", "destination": "/client/player/$1" },
+    { "source": "/", "destination": "/client/table/index.html" },
+    { "source": "/table", "destination": "/client/table/index.html" },
+    { "source": "/player", "destination": "/client/player/index.html" },
+    { "source": "/player/join", "destination": "/client/player/join.html" },
+    { "source": "/join", "destination": "/client/player/join.html" }
   ],
   "headers": [
     {

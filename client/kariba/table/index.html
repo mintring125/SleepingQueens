@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>카리바 - 테이블</title>
+  <link rel="stylesheet" href="/shared/styles/common.css">
+  <link rel="stylesheet" href="/kariba/table/table.css">
+</head>
+<body>
+  <div class="connection-status" id="connectionStatus"></div>
+
+  <div class="container">
+    <div class="header">
+      <h1>카리바</h1>
+      <p id="sessionInfo">세션 준비 중...</p>
+    </div>
+
+    <!-- ── 대기 페이즈 ── -->
+    <div id="waitingPhase">
+
+      <!-- 설정 패널 -->
+      <div class="panel" id="setupPanel">
+        <h2>게임 설정</h2>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+          <label style="font-size:17px;cursor:pointer;display:flex;align-items:center;gap:10px;">
+            <input type="checkbox" id="expertModeCheck" style="width:20px;height:20px;">
+            <span>숙련자 모드 (공개 카드 3장)</span>
+          </label>
+          <button class="primary" id="createGameBtn" onclick="createGame()" style="width:100%;max-width:300px;">게임 만들기</button>
+        </div>
+
+        <div class="rules-panel panel" style="margin-top:20px;font-size:0.88em;text-align:left;">
+          <h3 style="text-align:center;margin-bottom:10px;">📋 게임 규칙 요약</h3>
+          <ul style="line-height:1.7;padding-left:20px;">
+            <li><strong>목표:</strong> 게임 종료 시 획득 카드 장수가 가장 많은 플레이어 승리</li>
+            <li><strong>턴:</strong> 같은 종류 동물 카드 1장 이상 해당 슬롯에 내려놓기</li>
+            <li><strong>사냥:</strong> 슬롯에 3장 이상 모이면 바로 아래 번호 동물을 모두 획득</li>
+            <li><strong>생쥐(1번) 특수:</strong> 코끼리(8번)만 사냥 가능</li>
+            <li><strong>종료:</strong> 덱 소진 + 누군가 손패 0장 → 가장 많이 획득한 플레이어 승!</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- QR 패널 -->
+      <div class="panel hidden" id="qrPanel">
+        <h2>QR로 참가하세요</h2>
+        <div class="qr-container">
+          <div id="qrCode"></div>
+          <p id="joinUrl" class="join-url"></p>
+        </div>
+        <div class="players-waiting" id="playersWaiting">
+          <h3>참가자 (<span id="playerCount">0</span>/4)</h3>
+          <ul id="playerList"></ul>
+        </div>
+        <button class="success hidden" id="startGameBtn" onclick="startGame()">게임 시작</button>
+      </div>
+    </div>
+
+    <!-- ── 게임 페이즈 ── -->
+    <div id="playingPhase" class="hidden">
+      <div class="status-bar">
+        <span>현재 턴: <strong id="currentTurnName">-</strong></span>
+        <span>남은 덱: <strong id="deckCount">0</strong>장</span>
+      </div>
+
+      <!-- 물웅덩이 보드 -->
+      <div class="panel">
+        <h3 style="text-align:center;margin-bottom:16px;">🌊 물웅덩이</h3>
+        <div class="watering-hole" id="wateringHole">
+          <!-- 8개 동물 슬롯 + 중앙 덱 - JS로 생성 -->
+        </div>
+      </div>
+
+      <!-- 플레이어 정보 -->
+      <div class="players-board" id="playersBoard"></div>
+
+      <!-- 게임 로그 -->
+      <div class="panel">
+        <h3>게임 로그</h3>
+        <div class="action-log" id="actionLog"></div>
+      </div>
+    </div>
+
+    <!-- ── 종료 페이즈 ── -->
+    <div id="endPhase" class="hidden">
+      <div class="panel end-panel">
+        <h2>🎉 게임 종료!</h2>
+        <div id="winnerDisplay" class="winner-display"></div>
+        <div id="finalScores" class="final-scores"></div>
+        <button class="primary" onclick="location.reload()">새 게임</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer"></div>
+
+  <!-- 사냥 애니메이션 오버레이 -->
+  <div class="hunt-overlay hidden" id="huntOverlay">
+    <div class="hunt-popup" id="huntPopup"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="/shared/env.js"></script>
+  <script src="/kariba/shared/kariba-socket.js"></script>
+  <script src="/kariba/table/table.js"></script>
+</body>
+</html>

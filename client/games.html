@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>테이블 게임 - 게임 선택</title>
+  <link rel="stylesheet" href="/shared/styles/common.css">
+  <style>
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin: 32px auto;
+      max-width: 700px;
+    }
+    .game-card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 24px;
+      padding: 32px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      text-decoration: none;
+      color: var(--text-primary);
+      display: block;
+    }
+    .game-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+      border-color: rgba(255,255,255,0.3);
+    }
+    .game-card .game-icon {
+      font-size: 72px;
+      margin-bottom: 16px;
+      display: block;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+    }
+    .game-card h2 {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .game-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .game-card .badge {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .game-card.queens { border-top: 4px solid #7C3AED; }
+    .game-card.queens .badge { background: linear-gradient(135deg,#7C3AED,#A78BFA); color:white; }
+    .game-card.kariba { border-top: 4px solid #D97706; }
+    .game-card.kariba .badge { background: linear-gradient(135deg,#D97706,#F59E0B); color:white; }
+    .page-subtitle { color: var(--text-secondary); margin-top: 4px; }
+    .header h1::before { content: '🎲 '; }
+    .header h1::after  { content: ' 🎲'; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>테이블 게임</h1>
+      <p class="page-subtitle">게임을 선택하세요</p>
+    </div>
+
+    <div class="games-grid">
+      <a href="/table" class="game-card queens">
+        <span class="game-icon">👑</span>
+        <h2>슬리핑 퀸즈</h2>
+        <p>2~5명 · 약 20분<br>마법의 왕국에서 잠든 퀸을 깨워라!</p>
+        <span class="badge">테이블 열기</span>
+      </a>
+
+      <a href="/kariba/table" class="game-card kariba">
+        <span class="game-icon">🦒</span>
+        <h2>카리바</h2>
+        <p>2~4명 · 약 15분<br>아프리카 물웅덩이를 차지하는 동물 카드게임!</p>
+        <span class="badge">테이블 열기</span>
+      </a>
+    </div>
+  </div>
+</body>
+</html>

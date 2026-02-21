@@ -4,15 +4,25 @@ let timerInterval = null;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-  socketManager.connect();
+  setCreateGameButtonEnabled(false);
 
   socketManager.on('connect', () => {
     document.getElementById('connectionStatus').className = 'connection-status connected';
+    setCreateGameButtonEnabled(true);
   });
 
   socketManager.on('disconnect', () => {
     document.getElementById('connectionStatus').className = 'connection-status disconnected';
+    setCreateGameButtonEnabled(false);
   });
+
+  socketManager.on('connect_error', () => {
+    document.getElementById('connectionStatus').className = 'connection-status disconnected';
+    setCreateGameButtonEnabled(false);
+    showToast('서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.', 'error');
+  });
+
+  socketManager.connect();
 
   socketManager.on('serverInfo', (data) => {
     // Store server info for QR generation
@@ -58,6 +68,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function createGame() {
+  if (!socketManager.connected) {
+    showToast('서버 연결 중입니다. 잠시만 기다려주세요.', 'info');
+    return;
+  }
   const houseRuleAllQueens = document.getElementById('houseRuleAllQueens')?.checked || false;
   socketManager.emit('createGame', { houseRuleAllQueens });
 }
@@ -372,4 +386,12 @@ function showDiscardAnimation(data) {
       animContainer.remove();
     }
   }, 1500);
+}
+
+function setCreateGameButtonEnabled(enabled) {
+  const btn = document.getElementById('createGameBtn');
+  if (!btn) return;
+  btn.disabled = !enabled;
+  btn.style.opacity = enabled ? '1' : '0.6';
+  btn.style.cursor = enabled ? 'pointer' : 'not-allowed';
 }

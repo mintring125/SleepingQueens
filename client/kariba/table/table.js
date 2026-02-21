@@ -1,0 +1,269 @@
+// ── 카리바 테이블 컨트롤러 ───────────────────────────────────────
+
+const ANIMALS = {
+  1: { name: '생쥐',    emoji: '🐭', en: 'Mouse',    img: 'Kariba_1_Mouse_00001.png' },
+  2: { name: '미어캣',  emoji: '🦡', en: 'Meerkat',  img: 'Kariba_2_Meerkat_00001.png' },
+  3: { name: '얼룩말',  emoji: '🦓', en: 'Zebra',    img: 'Kariba_3_Zebra_00001.png' },
+  4: { name: '기린',    emoji: '🦒', en: 'Giraffe',  img: 'Kariba_4_Giraffe_00001.png' },
+  5: { name: '타조',    emoji: '🐦', en: 'Ostrich',  img: 'Kariba_5_Ostrich_00001.png' },
+  6: { name: '치타',    emoji: '🐆', en: 'Cheetah',  img: 'Kariba_6_Cheetah_00001.png' },
+  7: { name: '코뿔소',  emoji: '🦏', en: 'Rhino',    img: 'Kariba_7_Rhino_00001.png' },
+  8: { name: '코끼리',  emoji: '🐘', en: 'Elephant', img: 'Kariba_8_Elephant_00001.png' }
+};
+
+let gameState = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+  buildWateringHole();
+
+  karibaSocket.on('connect', () => {
+    document.getElementById('connectionStatus').className = 'connection-status connected';
+    document.getElementById('createGameBtn').disabled = false;
+  });
+
+  karibaSocket.on('disconnect', () => {
+    document.getElementById('connectionStatus').className = 'connection-status disconnected';
+  });
+
+  karibaSocket.on('gameCreated', (data) => {
+    document.getElementById('sessionInfo').textContent = `세션: ${data.sessionId}`;
+    karibaSocket.setSession(data.sessionId);
+    showQR(data.qrDataUrl, data.joinUrl);
+    document.getElementById('setupPanel').classList.add('hidden');
+    document.getElementById('qrPanel').classList.remove('hidden');
+  });
+
+  karibaSocket.on('playerJoined', (data) => {
+    updatePlayerList(data);
+    showToast(`${data.playerName} 참가!`, 'success');
+  });
+
+  karibaSocket.on('gameState', (data) => {
+    gameState = data;
+    updateDisplay();
+  });
+
+  karibaSocket.on('turnStart', (data) => {
+    document.getElementById('currentTurnName').textContent = data.playerName;
+    addLog(`⭐ ${data.playerName}의 턴`);
+  });
+
+  karibaSocket.on('huntResult', (data) => {
+    showHuntAnimation(data);
+    const hunter = ANIMALS[data.hunterType];
+    const hunted = ANIMALS[data.huntedType];
+    const isSpecial = data.hunterType === 1;
+    addLog(
+      `${isSpecial ? '⚡' : '🏹'} ${data.hunterName}의 ${hunter.emoji}${hunter.name}이(가) ${hunted.emoji}${hunted.name} ${data.cardCount}장 획득!`,
+      isSpecial ? 'special' : 'hunt'
+    );
+  });
+
+  karibaSocket.on('gameEnd', (data) => {
+    showGameEnd(data);
+  });
+
+  karibaSocket.on('actionResult', (data) => {
+    if (data.message) addLog(data.message);
+  });
+
+  karibaSocket.on('restartStatus', (data) => {
+    showToast(`재경기 요청: ${data.current}/${data.total}`, 'info');
+  });
+
+  document.getElementById('createGameBtn').disabled = true;
+  karibaSocket.connect();
+});
+
+// ── 게임 생성 / 시작 ──────────────────────────────────────────────
+function createGame() {
+  const expertMode = document.getElementById('expertModeCheck').checked;
+  karibaSocket.emit('createGame', { expertMode });
+}
+
+function startGame() {
+  karibaSocket.emit('startGame', {});
+}
+
+// ── 물웅덩이 보드 초기화 (DOM 생성) ─────────────────────────────
+function buildWateringHole() {
+  const board = document.getElementById('wateringHole');
+  board.innerHTML = '';
+
+  for (let type = 1; type <= 8; type++) {
+    const a = ANIMALS[type];
+    const slot = document.createElement('div');
+    slot.className = `animal-slot slot-${type}`;
+    slot.id = `slot-${type}`;
+    slot.innerHTML = `
+      <img class="slot-img" src="/kariba/assets/images/${a.img}"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='block'"
+           alt="${a.name}">
+      <span class="slot-emoji" style="display:none">${a.emoji}</span>
+      <div class="slot-count-row">
+        <span class="slot-count zero" id="count-${type}">0</span>
+      </div>
+      <div class="slot-name">${a.name}</div>
+      <div class="slot-num">${type}번</div>
+    `;
+    board.appendChild(slot);
+  }
+
+  // 중앙 덱
+  const deck = document.createElement('div');
+  deck.className = 'deck-center';
+  deck.innerHTML = `
+    <div class="deck-icon">🃏</div>
+    <div class="deck-count" id="deckCountCenter">64</div>
+    <div class="deck-label">남은 덱</div>
+  `;
+  board.appendChild(deck);
+}
+
+// ── 화면 업데이트 ─────────────────────────────────────────────────
+function updateDisplay() {
+  if (!gameState) return;
+
+  const { phase, wateringHole, deckRemaining, players, currentPlayerId } = gameState;
+
+  if (phase === 'waiting') return;
+
+  // 게임 뷰로 전환
+  if (phase === 'playing' || phase === 'ended') {
+    document.getElementById('waitingPhase').classList.add('hidden');
+    document.getElementById('playingPhase').classList.remove('hidden');
+  }
+
+  // 물웅덩이 슬롯 업데이트
+  for (let type = 1; type <= 8; type++) {
+    const count = (wateringHole[type] || []).length;
+    const countEl = document.getElementById(`count-${type}`);
+    if (countEl) {
+      countEl.textContent = count;
+      countEl.className = `slot-count ${count === 0 ? 'zero' : ''}`;
+    }
+  }
+
+  // 덱 카운트
+  document.getElementById('deckCount').textContent = deckRemaining;
+  const deckCenter = document.getElementById('deckCountCenter');
+  if (deckCenter) deckCenter.textContent = deckRemaining;
+
+  // 플레이어 보드
+  renderPlayersBoard(players, currentPlayerId);
+}
+
+function renderPlayersBoard(players, currentPlayerId) {
+  const board = document.getElementById('playersBoard');
+  if (!players || players.length === 0) { board.innerHTML = ''; return; }
+
+  board.innerHTML = players.map(p => `
+    <div class="player-card ${p.id === currentPlayerId ? 'current-turn' : ''}">
+      <div class="player-name">${p.name}</div>
+      <div class="player-stats">
+        <div class="stat-item">
+          <div class="stat-value">${p.handCount}</div>
+          <div class="stat-label">손패</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">${p.collectedCount}</div>
+          <div class="stat-label">획득</div>
+        </div>
+      </div>
+      ${p.id === currentPlayerId ? '<div class="turn-badge">⭐ 내 차례</div>' : ''}
+      ${!p.connected ? '<div class="disconnected-badge">연결 끊김</div>' : ''}
+    </div>
+  `).join('');
+}
+
+// ── QR 코드 표시 ───────────────────────────────────────────────────
+function showQR(qrDataUrl, joinUrl) {
+  const qrDiv = document.getElementById('qrCode');
+  qrDiv.innerHTML = '';
+  if (qrDataUrl) {
+    const img = document.createElement('img');
+    img.src = qrDataUrl;
+    img.width = 200;
+    img.height = 200;
+    qrDiv.appendChild(img);
+  } else {
+    new QRCode(qrDiv, { text: joinUrl, width: 200, height: 200 });
+  }
+  document.getElementById('joinUrl').textContent = joinUrl;
+}
+
+// ── 참가자 목록 ────────────────────────────────────────────────────
+function updatePlayerList(data) {
+  document.getElementById('playerCount').textContent = data.playerCount;
+  // Re-query from gameState on next update; just add to list
+  const li = document.createElement('li');
+  li.textContent = data.playerName;
+  document.getElementById('playerList').appendChild(li);
+
+  // 2명 이상이면 시작 버튼 표시
+  if (data.playerCount >= 2) {
+    document.getElementById('startGameBtn').classList.remove('hidden');
+  }
+}
+
+// ── 사냥 애니메이션 ────────────────────────────────────────────────
+function showHuntAnimation(data) {
+  const hunter = ANIMALS[data.hunterType];
+  const hunted = ANIMALS[data.huntedType];
+  const isMouseElephant = data.hunterType === 1 && data.huntedType === 8;
+
+  const popup = document.getElementById('huntPopup');
+  popup.innerHTML = `
+    <div style="font-size:48px;margin-bottom:8px">${hunter.emoji} → ${hunted.emoji}</div>
+    <div>${isMouseElephant ? '⚡ 생쥐가 코끼리를 쫓아냈다!' : '🏹 사냥!'}</div>
+    <div style="font-size:16px;margin-top:8px;opacity:0.8">${hunter.name}이(가) ${hunted.name} ${data.cardCount}장 획득!</div>
+  `;
+
+  // 해당 슬롯 하이라이트
+  const hunterSlot = document.getElementById(`slot-${data.hunterType}`);
+  const huntedSlot = document.getElementById(`slot-${data.huntedType}`);
+  if (hunterSlot) { hunterSlot.classList.add('hunting'); setTimeout(() => hunterSlot.classList.remove('hunting'), 1000); }
+  if (huntedSlot) { huntedSlot.classList.add('hunted');  setTimeout(() => huntedSlot.classList.remove('hunted'),  1000); }
+
+  const overlay = document.getElementById('huntOverlay');
+  overlay.classList.remove('hidden');
+  setTimeout(() => overlay.classList.add('hidden'), 2200);
+}
+
+// ── 게임 종료 화면 ─────────────────────────────────────────────────
+function showGameEnd(data) {
+  document.getElementById('playingPhase').classList.add('hidden');
+  document.getElementById('endPhase').classList.remove('hidden');
+
+  document.getElementById('winnerDisplay').innerHTML =
+    `🏆 ${data.winnerName || '?'} 승리!`;
+
+  const scoresHtml = (data.scores || []).map((s, i) => `
+    <div class="score-row ${i === 0 ? 'rank-1' : ''}">
+      <span>${i + 1}위 ${s.name}</span>
+      <span>${s.score}장 획득</span>
+    </div>
+  `).join('');
+  document.getElementById('finalScores').innerHTML = scoresHtml;
+}
+
+// ── 게임 로그 ─────────────────────────────────────────────────────
+function addLog(message, type = '') {
+  const log = document.getElementById('actionLog');
+  const entry = document.createElement('div');
+  entry.className = `log-entry ${type}`;
+  entry.textContent = message;
+  log.prepend(entry);
+  // 최대 50개
+  while (log.children.length > 50) log.removeChild(log.lastChild);
+}
+
+// ── 토스트 알림 ───────────────────────────────────────────────────
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3100);
+}

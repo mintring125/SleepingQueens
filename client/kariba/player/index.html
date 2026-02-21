@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>카리바 - 플레이어</title>
+  <link rel="stylesheet" href="/shared/styles/common.css">
+  <link rel="stylesheet" href="/kariba/player/player.css">
+</head>
+<body>
+  <div class="connection-status" id="connectionStatus"></div>
+
+  <div class="container">
+    <div class="header" style="padding:12px 20px;">
+      <h1 id="playerHeader">카리바</h1>
+    </div>
+
+    <!-- ── 대기 페이즈 ── -->
+    <div id="waitingPhase">
+      <div class="panel waiting-panel">
+        <div class="waiting-icon">🦒</div>
+        <h2>게임 대기 중...</h2>
+        <p id="waitingMsg" style="color:var(--text-secondary);margin-top:8px;">테이블에서 게임을 시작해주세요</p>
+        <div class="game-info" style="margin-top:24px;justify-content:center;gap:32px;">
+          <div class="info-item">
+            <div class="info-value" id="waitPlayerCount">-</div>
+            <div class="info-label">참가자</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 게임 페이즈 ── -->
+    <div id="playingPhase" class="hidden">
+
+      <!-- 턴 정보 -->
+      <div id="turnInfo">대기 중...</div>
+
+      <!-- 손패 영역 -->
+      <div class="panel hand-area">
+        <h3 style="margin-bottom:8px;">내 카드</h3>
+        <div class="hand-cards" id="handCards"></div>
+
+        <!-- 액션 영역 -->
+        <div class="action-area">
+          <div class="selected-info" id="selectedInfo">카드를 선택하세요</div>
+
+          <div class="count-control">
+            <button class="count-btn" id="countDown" onclick="changeCount(-1)" disabled>－</button>
+            <span id="countDisplay">1</span>
+            <button class="count-btn" id="countUp" onclick="changeCount(1)" disabled>＋</button>
+          </div>
+
+          <button id="playBtn" onclick="playCards()" disabled>카드 내려놓기</button>
+        </div>
+
+        <!-- 게임 정보 -->
+        <div class="game-info">
+          <div class="info-item">
+            <div class="info-value" id="myCollected">0</div>
+            <div class="info-label">내 획득</div>
+          </div>
+          <div class="info-item">
+            <div class="info-value" id="deckRemaining">-</div>
+            <div class="info-label">남은 덱</div>
+          </div>
+          <div class="info-item">
+            <div class="info-value" id="myHandCount">-</div>
+            <div class="info-label">손패</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 물웅덩이 현황 (간략) -->
+      <div class="panel" id="boardSummaryPanel">
+        <h3 style="margin-bottom:10px;">🌊 물웅덩이 현황</h3>
+        <div id="boardSummary" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;"></div>
+      </div>
+
+    </div>
+
+    <!-- ── 종료 페이즈 ── -->
+    <div id="endPhase" class="hidden">
+      <div class="panel end-panel-player">
+        <h2>🎉 게임 종료!</h2>
+        <div class="winner-msg" id="winnerMsg"></div>
+        <div class="score-list" id="scoreList"></div>
+        <button id="restartBtn" onclick="requestRestart()">재경기 요청</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+  <script src="/shared/env.js"></script>
+  <script src="/kariba/shared/kariba-socket.js"></script>
+  <script src="/kariba/player/player.js"></script>
+</body>
+</html>

@@ -647,6 +647,25 @@ class GameManager {
     this.io.to(player.id).emit('playerHand', { cards: player.hand });
   }
 
+  canPlayerDoAnything(player, game) {
+    const hand = player.hand;
+
+    // 숫자 카드가 있으면 항상 버릴 수 있음
+    if (hand.some(c => c.type === 'number')) return true;
+
+    // king 카드가 있고 잠든 퀸이 있으면 사용 가능
+    if (hand.some(c => c.type === 'king') && game.sleepingQueens.length > 0) return true;
+
+    // knight/potion 카드가 있고 다른 연결된 플레이어에게 퀸이 있으면 사용 가능
+    const othersHaveQueens = game.players.some(p =>
+      p.id !== player.id && p.connected && p.awakenedQueens.length > 0
+    );
+    if ((hand.some(c => c.type === 'knight') || hand.some(c => c.type === 'potion')) && othersHaveQueens) return true;
+
+    // dragon/wand는 action 단계에서 사용 불가
+    return false;
+  }
+
   startTurn(sessionId) {
     const game = this.games.get(sessionId);
     if (!game || game.phase !== 'playing') return;
@@ -654,6 +673,27 @@ class GameManager {
     const currentPlayer = game.getCurrentPlayer();
     game.turnPhase = 'action';
     game.pendingAction = null;
+
+    // 아무것도 할 수 없으면 자동으로 턴 넘기기
+    if (!this.canPlayerDoAnything(currentPlayer, game)) {
+      game.consecutiveSkips = (game.consecutiveSkips || 0) + 1;
+      const connectedCount = game.players.filter(p => p.connected).length;
+
+      if (game.consecutiveSkips < connectedCount) {
+        this.io.to(sessionId).emit('actionResult', {
+          success: true,
+          message: `${currentPlayer.name}은(는) 사용 가능한 카드가 없어 턴이 자동으로 넘어갑니다`
+        });
+        this.broadcastGameState(sessionId);
+        game.nextTurn();
+        setTimeout(() => this.startTurn(sessionId), 400);
+        return;
+      }
+      // 모든 플레이어가 연속으로 스킵되면 무한루프 방지 후 강제 진행
+      game.consecutiveSkips = 0;
+    } else {
+      game.consecutiveSkips = 0;
+    }
 
     this.io.to(sessionId).emit('turnStart', {
       playerId: currentPlayer.id,

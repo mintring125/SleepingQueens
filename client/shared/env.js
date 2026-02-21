@@ -4,6 +4,7 @@
 
 (function () {
   const _host = window.location.hostname;
+  const _origin = window.location.origin;
 
   const isLocal =
     _host === 'localhost' ||
@@ -12,10 +13,23 @@
     /^10\./.test(_host) ||
     /^172\.(1[6-9]|2\d|3[01])\./.test(_host);
 
-  // Online: use injected env or fallback to Render URL
-  const BACKEND_URL = isLocal
-    ? `http://${_host}:3000`
-    : (window.__ENV__?.BACKEND_URL || 'https://sleepingqueens-1w2r.onrender.com');
+  const envBackendUrl = window.__ENV__?.BACKEND_URL;
+  const onlineFallbacks = [
+    envBackendUrl,
+    // Render service URL candidates (old/new)
+    'https://sleeping-queens-server.onrender.com',
+    'https://sleepingqueens-1w2r.onrender.com'
+  ].filter(Boolean);
 
-  window.ENV = { isLocal, BACKEND_URL };
+  // If frontend itself is served on Render, try same-origin backend first.
+  if (!isLocal && /\.onrender\.com$/.test(_host)) {
+    onlineFallbacks.unshift(_origin);
+  }
+
+  const BACKEND_URLS = isLocal
+    ? [`http://${_host}:3000`]
+    : [...new Set(onlineFallbacks)];
+  const BACKEND_URL = BACKEND_URLS[0];
+
+  window.ENV = { isLocal, BACKEND_URL, BACKEND_URLS };
 })();
