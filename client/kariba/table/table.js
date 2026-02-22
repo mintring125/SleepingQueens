@@ -13,6 +13,10 @@ const ANIMALS = {
 
 let gameState = null;
 let reconnectQrSessionId = null;
+const COLLECT_ANIM_BASE_DELAY = 80;
+const COLLECT_ANIM_START_OFFSET = 90;
+const COLLECT_ANIM_REMOVE_DELAY = 430;
+let audioCtx = null;
 
 function getSlotAngle(type) {
   return ((1 - type) * 45 + 360) % 360;
@@ -20,6 +24,8 @@ function getSlotAngle(type) {
 
 document.addEventListener('DOMContentLoaded', () => {
   buildWateringHole();
+  setupFullscreenButton();
+  initAudioUnlock();
 
   karibaSocket.on('connect', () => {
     document.getElementById('connectionStatus').className = 'connection-status connected';
@@ -92,11 +98,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── 게임 생성 / 시작 ──────────────────────────────────────────────
 function createGame() {
+  ensureAudioContext();
   const expertMode = document.getElementById('expertModeCheck').checked;
   karibaSocket.emit('createGame', { expertMode });
 }
 
 function startGame() {
+  ensureAudioContext();
   karibaSocket.emit('startGame', {});
 }
 
@@ -130,6 +138,7 @@ function buildWateringHole() {
     slot.id = `slot-${type}`;
     slot.style.cursor = 'pointer';
     slot.onclick = () => {
+      ensureAudioContext();
       const angle = getSlotAngle(type);
 
       // 터치 시각 피드백
@@ -318,6 +327,7 @@ function animateFlyingCards(data) {
   const targetSlot = document.getElementById(`slot-${cardType}`);
 
   if (!playerCard || !targetSlot) return;
+  playPlaceCardsSfx();
 
   const startRect = playerCard.getBoundingClientRect();
   const endRect = targetSlot.getBoundingClientRect();
@@ -347,13 +357,14 @@ function animateCollectedCardsToPlayer(data) {
     .find(el => el.dataset.playerId === hunterId);
 
   if (!sourceSlot || !targetPlayerCard) return;
+  playCollectCardsSfx();
 
   const startRect = sourceSlot.getBoundingClientRect();
   const endRect = targetPlayerCard.getBoundingClientRect();
-  const visibleCount = Math.min(cardCount, 10);
+  const visibleCount = Math.min(Math.max(3, Math.ceil(cardCount * 0.7)), 8);
 
   targetPlayerCard.classList.add('gain-highlight');
-  setTimeout(() => targetPlayerCard.classList.remove('gain-highlight'), 900);
+  setTimeout(() => targetPlayerCard.classList.remove('gain-highlight'), 650);
 
   for (let i = 0; i < visibleCount; i++) {
     const flyingImg = document.createElement('img');
@@ -361,16 +372,105 @@ function animateCollectedCardsToPlayer(data) {
     flyingImg.className = 'flying-card collected';
     document.body.appendChild(flyingImg);
 
-    flyingImg.style.left = `${startRect.left + startRect.width / 2 - 24 + (Math.random() * 20 - 10)}px`;
-    flyingImg.style.top = `${startRect.top + startRect.height / 2 - 34 + (Math.random() * 20 - 10)}px`;
+    flyingImg.style.left = `${startRect.left + startRect.width / 2 - 24 + (Math.random() * 24 - 12)}px`;
+    flyingImg.style.top = `${startRect.top + startRect.height / 2 - 34 + (Math.random() * 24 - 12)}px`;
 
     setTimeout(() => {
-      const driftX = Math.random() * 36 - 18;
-      const driftY = Math.random() * 24 - 12;
+      const driftX = Math.random() * 24 - 12;
+      const driftY = Math.random() * 18 - 9;
       flyingImg.style.transform = `translate(${endRect.left - startRect.left + driftX}px, ${endRect.top - startRect.top + driftY}px) scale(0.65) rotate(${Math.random() * 30 - 15}deg)`;
-      setTimeout(() => flyingImg.remove(), 520);
-    }, i * 90 + 120);
+      flyingImg.style.opacity = '0.2';
+      setTimeout(() => flyingImg.remove(), COLLECT_ANIM_REMOVE_DELAY);
+    }, i * COLLECT_ANIM_BASE_DELAY + COLLECT_ANIM_START_OFFSET);
   }
+}
+
+function setupFullscreenButton() {
+  const btn = document.getElementById('fullscreenBtn');
+  if (!btn) return;
+
+  const refreshLabel = () => {
+    btn.textContent = document.fullscreenElement ? '⤢ 전체화면 종료' : '⛶ 전체화면';
+  };
+
+  btn.addEventListener('click', async () => {
+    ensureAudioContext();
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch (err) {
+      console.warn('[Kariba] 전체화면 전환 실패:', err);
+    } finally {
+      refreshLabel();
+    }
+  });
+
+  document.addEventListener('fullscreenchange', refreshLabel);
+  refreshLabel();
+}
+
+function initAudioUnlock() {
+  document.addEventListener('pointerdown', () => {
+    ensureAudioContext();
+  }, { once: true });
+}
+
+function ensureAudioContext() {
+  const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextCtor) return null;
+
+  if (!audioCtx) {
+    audioCtx = new AudioContextCtor();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume().catch(() => {});
+  }
+  return audioCtx;
+}
+
+function scheduleTone(ctx, options) {
+  const {
+    freq,
+    type = 'sine',
+    gain = 0.045,
+    attack = 0.005,
+    release = 0.09,
+    start = ctx.currentTime
+  } = options;
+
+  const osc = ctx.createOscillator();
+  const g = ctx.createGain();
+
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, start);
+  g.gain.setValueAtTime(0.0001, start);
+  g.gain.linearRampToValueAtTime(gain, start + attack);
+  g.gain.exponentialRampToValueAtTime(0.0001, start + release);
+
+  osc.connect(g);
+  g.connect(ctx.destination);
+  osc.start(start);
+  osc.stop(start + release + 0.01);
+}
+
+function playPlaceCardsSfx() {
+  const ctx = ensureAudioContext();
+  if (!ctx) return;
+  const t = ctx.currentTime;
+  scheduleTone(ctx, { freq: 520, type: 'triangle', gain: 0.03, release: 0.07, start: t });
+  scheduleTone(ctx, { freq: 420, type: 'triangle', gain: 0.028, release: 0.09, start: t + 0.06 });
+}
+
+function playCollectCardsSfx() {
+  const ctx = ensureAudioContext();
+  if (!ctx) return;
+  const t = ctx.currentTime;
+  scheduleTone(ctx, { freq: 420, type: 'sine', gain: 0.026, release: 0.08, start: t });
+  scheduleTone(ctx, { freq: 560, type: 'sine', gain: 0.03, release: 0.08, start: t + 0.06 });
+  scheduleTone(ctx, { freq: 760, type: 'sine', gain: 0.034, release: 0.1, start: t + 0.12 });
 }
 
 // ── 게임 종료 화면 ─────────────────────────────────────────────────

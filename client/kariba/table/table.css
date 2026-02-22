@@ -42,6 +42,21 @@ body::after {
   background: linear-gradient(90deg, var(--savanna-accent), var(--savanna-gold), #a16207) !important;
 }
 
+.status-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fs-toggle-btn {
+  min-width: 0;
+  min-height: 34px;
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 10px;
+  line-height: 1;
+}
+
 /* ── 물웅덩이 보드 ─────────────────────────────── */
 .watering-hole {
   position: relative;
@@ -259,11 +274,11 @@ body::after {
   width: 48px;
   height: 68px;
   opacity: 0.95;
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease;
+  transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.36s ease;
 }
 
 .player-card.gain-highlight {
-  animation: gainPulse 0.9s ease;
+  animation: gainPulse 0.65s ease;
 }
 
 @keyframes gainPulse {
@@ -542,6 +557,17 @@ body::after {
 
 /* ── 반응형 ─────────────────────────────────── */
 @media (max-width: 640px) {
+  .status-bar {
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .status-actions {
+    width: 100%;
+    justify-content: center;
+  }
+
   .watering-hole {
     width: 340px;
     height: 340px;
