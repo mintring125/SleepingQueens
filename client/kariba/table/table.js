@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   karibaSocket.on('huntResult', (data) => {
+    animateCollectedCardsToPlayer(data);
     showHuntAnimation(data);
     const hunter = ANIMALS[data.hunterType];
     const hunted = ANIMALS[data.huntedType];
@@ -247,7 +248,7 @@ function renderPlayersBoard(players, currentPlayerId) {
         </div>
         <div class="stat-item">
           <div class="stat-value">${p.collectedCount}</div>
-          <div class="stat-label">획득</div>
+          <div class="stat-label">점수(획득)</div>
         </div>
       </div>
       ${p.id === currentPlayerId ? '<div class="turn-badge">⭐ 내 차례</div>' : ''}
@@ -339,6 +340,39 @@ function animateFlyingCards(data) {
   }
 }
 
+function animateCollectedCardsToPlayer(data) {
+  const { hunterId, huntedType, cardCount } = data;
+  const sourceSlot = document.getElementById(`slot-${huntedType}`);
+  const targetPlayerCard = Array.from(document.querySelectorAll('.player-card'))
+    .find(el => el.dataset.playerId === hunterId);
+
+  if (!sourceSlot || !targetPlayerCard) return;
+
+  const startRect = sourceSlot.getBoundingClientRect();
+  const endRect = targetPlayerCard.getBoundingClientRect();
+  const visibleCount = Math.min(cardCount, 10);
+
+  targetPlayerCard.classList.add('gain-highlight');
+  setTimeout(() => targetPlayerCard.classList.remove('gain-highlight'), 900);
+
+  for (let i = 0; i < visibleCount; i++) {
+    const flyingImg = document.createElement('img');
+    flyingImg.src = `/kariba/assets/images/${ANIMALS[huntedType].img}`;
+    flyingImg.className = 'flying-card collected';
+    document.body.appendChild(flyingImg);
+
+    flyingImg.style.left = `${startRect.left + startRect.width / 2 - 24 + (Math.random() * 20 - 10)}px`;
+    flyingImg.style.top = `${startRect.top + startRect.height / 2 - 34 + (Math.random() * 20 - 10)}px`;
+
+    setTimeout(() => {
+      const driftX = Math.random() * 36 - 18;
+      const driftY = Math.random() * 24 - 12;
+      flyingImg.style.transform = `translate(${endRect.left - startRect.left + driftX}px, ${endRect.top - startRect.top + driftY}px) scale(0.65) rotate(${Math.random() * 30 - 15}deg)`;
+      setTimeout(() => flyingImg.remove(), 520);
+    }, i * 90 + 120);
+  }
+}
+
 // ── 게임 종료 화면 ─────────────────────────────────────────────────
 function showGameEnd(data) {
   document.getElementById('playingPhase').classList.add('hidden');
@@ -350,7 +384,7 @@ function showGameEnd(data) {
   const scoresHtml = (data.scores || []).map((s, i) => `
     <div class="score-row ${i === 0 ? 'rank-1' : ''}">
       <span>${i + 1}위 ${s.name}</span>
-      <span>${s.score}장 획득</span>
+      <span>${s.score}점 (획득 ${s.score}장)</span>
     </div>
   `).join('');
   document.getElementById('finalScores').innerHTML = scoresHtml;
