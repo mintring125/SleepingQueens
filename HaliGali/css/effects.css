@@ -1,0 +1,257 @@
+/* ═══════════════════════════════════════
+   PARTICLES
+═══════════════════════════════════════ */
+.particles-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 500;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: particle-fly var(--duration, 1s) ease-out forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes particle-fly {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx, 100px), var(--dy, -150px)) scale(0) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Star particle */
+.particle-star {
+  border-radius: 0;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+/* ═══════════════════════════════════════
+   GLOW EFFECTS
+═══════════════════════════════════════ */
+.glow-p1 {
+  box-shadow: 0 0 20px rgba(255, 71, 87, 0.6), 0 0 40px rgba(255, 71, 87, 0.3);
+}
+
+.glow-p2 {
+  box-shadow: 0 0 20px rgba(55, 66, 250, 0.6), 0 0 40px rgba(55, 66, 250, 0.3);
+}
+
+.glow-p3 {
+  box-shadow: 0 0 20px rgba(46, 213, 115, 0.6), 0 0 40px rgba(46, 213, 115, 0.3);
+}
+
+.glow-p4 {
+  box-shadow: 0 0 20px rgba(165, 94, 234, 0.6), 0 0 40px rgba(165, 94, 234, 0.3);
+}
+
+/* ═══════════════════════════════════════
+   COLLECT ANIMATION
+═══════════════════════════════════════ */
+@keyframes card-collect {
+  0% {
+    opacity: 1;
+    transform: var(--start-transform, translate(0,0) scale(1));
+  }
+  60% {
+    opacity: 1;
+    transform: var(--mid-transform, translate(0, -30px) scale(1.05));
+  }
+  100% {
+    opacity: 0;
+    transform: var(--end-transform, translate(0, -100px) scale(0.5));
+  }
+}
+
+.card-collecting {
+  animation: card-collect 0.5s ease-in forwards;
+  pointer-events: none;
+  z-index: 200;
+}
+
+/* ═══════════════════════════════════════
+   CORRECT FLASH (full screen)
+═══════════════════════════════════════ */
+.flash-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0;
+}
+
+.flash-overlay.flash-correct {
+  background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 70%);
+  animation: flash-in-out 0.6s ease-out forwards;
+}
+
+.flash-overlay.flash-wrong {
+  background: radial-gradient(circle, rgba(255,71,87,0.4) 0%, transparent 70%);
+  animation: flash-in-out 0.5s ease-out forwards;
+}
+
+@keyframes flash-in-out {
+  0%   { opacity: 0; }
+  20%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ═══════════════════════════════════════
+   SCORE POPUP
+═══════════════════════════════════════ */
+.score-popup {
+  position: fixed;
+  pointer-events: none;
+  z-index: 300;
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  animation: score-float 1.2s ease-out forwards;
+  white-space: nowrap;
+}
+
+@keyframes score-float {
+  0%   { opacity: 0; transform: translateY(0) scale(0.5); }
+  20%  { opacity: 1; transform: translateY(-10px) scale(1.1); }
+  80%  { opacity: 1; transform: translateY(-40px) scale(1); }
+  100% { opacity: 0; transform: translateY(-60px) scale(0.8); }
+}
+
+/* ═══════════════════════════════════════
+   ROUND TIMER (countdown when no bell)
+═══════════════════════════════════════ */
+.round-timer {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateY(-80px);
+  width: 36px;
+  height: 36px;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.round-timer.show {
+  opacity: 0.6;
+}
+
+.timer-circle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid var(--gold);
+  transform-origin: center;
+  animation: none;
+}
+
+.timer-circle.counting {
+  animation: timer-drain linear forwards;
+  animation-duration: var(--timer-duration, 2s);
+}
+
+@keyframes timer-drain {
+  from {
+    box-shadow: inset 0 0 0 18px var(--gold);
+    opacity: 0.7;
+  }
+  to {
+    box-shadow: inset 0 0 0 0px var(--gold);
+    opacity: 0.2;
+  }
+}
+
+/* ═══════════════════════════════════════
+   CARD COUNT CHANGE ANIMATION
+═══════════════════════════════════════ */
+.card-count.increase {
+  animation: count-up 0.4s ease;
+  color: #2ED573 !important;
+}
+
+.card-count.decrease {
+  animation: count-down 0.4s ease;
+  color: #FF4757 !important;
+}
+
+@keyframes count-up {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+
+@keyframes count-down {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(0.7); }
+  100% { transform: scale(1); }
+}
+
+/* ═══════════════════════════════════════
+   DEAL ANIMATION
+═══════════════════════════════════════ */
+@keyframes card-deal {
+  from {
+    opacity: 0;
+    transform: rotateY(0deg) scale(0.3) translateY(-60px);
+  }
+  to {
+    opacity: 1;
+    transform: rotateY(0deg) scale(1) translateY(0);
+  }
+}
+
+.card-dealing {
+  animation: card-deal 0.3s ease-out forwards;
+}
+
+/* ═══════════════════════════════════════
+   RING RIPPLE EFFECT
+═══════════════════════════════════════ */
+.ring-ripple {
+  position: absolute;
+  border-radius: 50%;
+  border: 3px solid;
+  pointer-events: none;
+  animation: ripple-expand 0.6s ease-out forwards;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes ripple-expand {
+  0% {
+    width: var(--bell-size);
+    height: var(--bell-size);
+    opacity: 1;
+    margin-left: calc(var(--bell-size) / -2);
+    margin-top: calc(var(--bell-size) / -2);
+  }
+  100% {
+    width: var(--bell-center-size);
+    height: var(--bell-center-size);
+    opacity: 0;
+    margin-left: calc(var(--bell-center-size) / -2);
+    margin-top: calc(var(--bell-center-size) / -2);
+  }
+}
+
+/* ═══════════════════════════════════════
+   NO BELL WARNING (2s passed without ring)
+═══════════════════════════════════════ */
+.no-ring-fade {
+  animation: no-ring 0.3s ease-out;
+}
+
+@keyframes no-ring {
+  from { filter: brightness(1.3); }
+  to   { filter: brightness(1); }
+}

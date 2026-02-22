@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>할리갈리 🔔</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/bell.css">
+  <link rel="stylesheet" href="css/card.css">
+  <link rel="stylesheet" href="css/effects.css">
+</head>
+<body>
+
+  <!-- ══════════════════════════════════
+       SETUP SCREEN
+  ══════════════════════════════════ -->
+  <div id="screen-setup" class="screen active">
+    <div class="setup-container">
+      <div class="setup-title">
+        <div class="setup-bell-icon">🔔</div>
+        <h1>할리갈리</h1>
+        <p class="setup-subtitle">같은 케릭터가 5명이 모이면 종을 쳐라!</p>
+      </div>
+
+      <div class="setup-section">
+        <h2>플레이어 수</h2>
+        <div class="player-count-buttons">
+          <button class="player-btn" data-count="2">
+            <span class="btn-number">2</span>
+            <span class="btn-label">명</span>
+          </button>
+          <button class="player-btn" data-count="3">
+            <span class="btn-number">3</span>
+            <span class="btn-label">명</span>
+          </button>
+          <button class="player-btn selected" data-count="4">
+            <span class="btn-number">4</span>
+            <span class="btn-label">명</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="setup-section">
+        <h2>캐릭터</h2>
+        <div class="character-preview">
+          <div class="char-item">
+            <img src="card/kitty-1.png" alt="키티냥" onerror="this.style.display='none'">
+            <span>키티냥</span>
+          </div>
+          <div class="char-item">
+            <img src="card/pudding-1.png" alt="푸딩독" onerror="this.style.display='none'">
+            <span>푸딩독</span>
+          </div>
+          <div class="char-item">
+            <img src="card/melody-1.png" alt="멜로디번" onerror="this.style.display='none'">
+            <span>멜로디번</span>
+          </div>
+          <div class="char-item">
+            <img src="card/cinna-1.png" alt="시나롤" onerror="this.style.display='none'">
+            <span>시나롤</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="setup-section">
+        <h2>자동 진행 속도</h2>
+        <div class="speed-buttons">
+          <button class="speed-btn" data-timeout="1800">
+            <span class="speed-label">빠름</span>
+            <span class="speed-value">1.8초</span>
+          </button>
+          <button class="speed-btn selected" data-timeout="3000">
+            <span class="speed-label">보통</span>
+            <span class="speed-value">3.0초</span>
+          </button>
+          <button class="speed-btn" data-timeout="4500">
+            <span class="speed-label">느림</span>
+            <span class="speed-value">4.5초</span>
+          </button>
+        </div>
+      </div>
+
+      <button id="btn-start" class="start-button">
+        게임 시작!
+      </button>
+
+      <div class="setup-rules">
+        <h3>📖 규칙</h3>
+        <ul>
+          <li><strong>같은 케릭터가 5명이 모이면</strong> 종 치기!</li>
+          <li>정답: 공개된 모든 카드를 가져감</li>
+          <li>오답: 각 플레이어에게 카드 1장씩 지불</li>
+          <li>카드가 없으면 탈락, 마지막 1명이 승리!</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       GAME SCREEN
+  ══════════════════════════════════ -->
+  <div id="screen-game" class="screen hidden">
+
+    <!-- P3: Top player (180°) -->
+    <div id="player-3" class="player-area player-top hidden-player">
+      <div class="player-info">
+        <div class="player-color-dot"></div>
+        <span class="player-name">P3</span>
+        <span class="card-count">0장</span>
+      </div>
+      <div class="player-cards">
+        <div class="card-pile hand-pile" id="hand-3">
+          <div class="pile-stack"></div>
+          <span class="pile-count">0</span>
+        </div>
+        <div class="card-pile revealed-pile" id="revealed-3">
+          <!-- revealed cards go here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Middle row: P2 | Bell Center | P4 -->
+    <div class="middle-row">
+
+      <!-- P2: Left player (90°) -->
+      <div id="player-2" class="player-area player-left hidden-player">
+        <div class="player-info">
+          <div class="player-color-dot"></div>
+          <span class="player-name">P2</span>
+          <span class="card-count">0장</span>
+        </div>
+        <div class="player-cards">
+          <div class="card-pile hand-pile" id="hand-2">
+            <div class="pile-stack"></div>
+            <span class="pile-count">0</span>
+          </div>
+          <div class="card-pile revealed-pile" id="revealed-2">
+          </div>
+        </div>
+      </div>
+
+      <!-- Bell Center -->
+      <div id="bell-center">
+        <!-- Color zones (fan/quadrant) -->
+        <div class="bell-zone zone-top"    id="zone-3" data-player="3"></div>
+        <div class="bell-zone zone-left"   id="zone-2" data-player="2"></div>
+        <div class="bell-zone zone-bottom" id="zone-1" data-player="1"></div>
+        <div class="bell-zone zone-right"  id="zone-4" data-player="4"></div>
+
+        <!-- Bell -->
+        <div id="bell" class="bell">
+          <div class="bell-inner">🔔</div>
+        </div>
+
+        <!-- Judgment overlay -->
+        <div id="bell-result" class="bell-result hidden"></div>
+      </div>
+
+      <!-- P4: Right player (-90°) -->
+      <div id="player-4" class="player-area player-right hidden-player">
+        <div class="player-info">
+          <div class="player-color-dot"></div>
+          <span class="player-name">P4</span>
+          <span class="card-count">0장</span>
+        </div>
+        <div class="player-cards">
+          <div class="card-pile revealed-pile" id="revealed-4">
+          </div>
+          <div class="card-pile hand-pile" id="hand-4">
+            <div class="pile-stack"></div>
+            <span class="pile-count">0</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- .middle-row -->
+
+    <!-- P1: Bottom player (0°) -->
+    <div id="player-1" class="player-area player-bottom">
+      <div class="player-cards">
+        <div class="card-pile hand-pile" id="hand-1">
+          <div class="pile-stack"></div>
+          <span class="pile-count">0</span>
+        </div>
+        <div class="card-pile revealed-pile" id="revealed-1">
+        </div>
+      </div>
+      <div class="player-info">
+        <div class="player-color-dot"></div>
+        <span class="player-name">P1</span>
+        <span class="card-count">0장</span>
+      </div>
+    </div>
+
+    <!-- Turn indicator -->
+    <div id="turn-indicator" class="turn-indicator"></div>
+
+    <!-- Status message -->
+    <div id="status-msg" class="status-msg"></div>
+
+    <!-- Pause/Menu button -->
+    <button id="btn-menu" class="menu-btn">☰</button>
+
+    <!-- Particle container -->
+    <div id="particles" class="particles-container"></div>
+
+  </div><!-- #screen-game -->
+
+  <!-- ══════════════════════════════════
+       GAME OVER SCREEN
+  ══════════════════════════════════ -->
+  <div id="screen-gameover" class="screen hidden">
+    <div class="gameover-container">
+      <div class="gameover-fireworks">🎉</div>
+      <h1 id="winner-text">P1 승리!</h1>
+      <div id="final-scores" class="final-scores"></div>
+      <div class="gameover-buttons">
+        <button id="btn-restart" class="start-button">다시 하기</button>
+        <button id="btn-menu-main" class="secondary-button">메인으로</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       ELIMINATED OVERLAY
+  ══════════════════════════════════ -->
+  <div id="eliminated-overlay" class="eliminated-overlay hidden">
+    <div class="eliminated-msg">
+      <span id="eliminated-player-name"></span> 탈락!
+    </div>
+  </div>
+
+  <!-- Card template (hidden) -->
+  <template id="card-template">
+    <div class="game-card" data-card-id="" data-character="" data-count="">
+      <div class="card-face card-front">
+        <img class="card-img" src="" alt="">
+      </div>
+      <div class="card-face card-back">
+        <img class="card-img" src="card/back.png" alt="뒷면">
+      </div>
+    </div>
+  </template>
+
+  <script src="js/deck.js"></script>
+  <script src="js/judge.js"></script>
+  <script src="js/sound.js"></script>
+  <script src="js/haptic.js"></script>
+  <script src="js/animation.js"></script>
+  <script src="js/bell.js"></script>
+  <script src="js/swipe.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
