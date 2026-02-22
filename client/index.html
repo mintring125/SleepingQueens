@@ -1,51 +1,87 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>테이블 게임 - 게임 선택</title>
+  <meta name="theme-color" content="#2D1B69">
+  <link rel="manifest" href="/manifest-home.json">
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
   <link rel="stylesheet" href="/shared/styles/common.css">
   <style>
+    .header-actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 14px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .install-btn {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 14px;
+      min-height: auto;
+      min-width: auto;
+      box-shadow: none;
+    }
+
+    .install-btn:not(.show) {
+      display: none;
+    }
+
     .games-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 24px;
       margin: 32px auto;
-      max-width: 700px;
+      max-width: 1020px;
     }
+
     .game-card {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 24px;
       padding: 32px 24px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       text-decoration: none;
       color: var(--text-primary);
       display: block;
     }
+
     .game-card:hover {
       transform: translateY(-6px) scale(1.02);
-      box-shadow: 0 16px 48px rgba(0,0,0,0.4);
-      border-color: rgba(255,255,255,0.3);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+      border-color: rgba(255, 255, 255, 0.3);
     }
+
     .game-card .game-icon {
       font-size: 72px;
       margin-bottom: 16px;
       display: block;
-      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
     }
+
     .game-card h2 {
       font-size: 24px;
       font-weight: 800;
       margin-bottom: 8px;
     }
+
     .game-card p {
       font-size: 14px;
       color: var(--text-secondary);
       line-height: 1.5;
     }
+
     .game-card .badge {
       display: inline-block;
       margin-top: 16px;
@@ -54,20 +90,75 @@
       font-size: 13px;
       font-weight: 700;
     }
-    .game-card.queens { border-top: 4px solid #7C3AED; }
-    .game-card.queens .badge { background: linear-gradient(135deg,#7C3AED,#A78BFA); color:white; }
-    .game-card.kariba { border-top: 4px solid #D97706; }
-    .game-card.kariba .badge { background: linear-gradient(135deg,#D97706,#F59E0B); color:white; }
-    .page-subtitle { color: var(--text-secondary); margin-top: 4px; }
-    .header h1::before { content: '🎲 '; }
-    .header h1::after  { content: ' 🎲'; }
+
+    .game-card.queens {
+      border-top: 4px solid #7C3AED;
+    }
+
+    .game-card.queens .badge {
+      background: linear-gradient(135deg, #7C3AED, #A78BFA);
+      color: white;
+    }
+
+    .game-card.kariba {
+      border-top: 4px solid #D97706;
+    }
+
+    .game-card.kariba .badge {
+      background: linear-gradient(135deg, #D97706, #F59E0B);
+      color: white;
+    }
+
+    .game-card.haligali {
+      border-top: 4px solid #db2777;
+    }
+
+    .game-card.haligali .badge {
+      background: linear-gradient(135deg, #db2777, #f472b6);
+      color: white;
+    }
+
+    .game-card.cobingo {
+      border-top: 4px solid #0ea5e9;
+    }
+
+    .game-card.cobingo .badge {
+      background: linear-gradient(135deg, #0369a1, #0ea5e9);
+      color: white;
+    }
+
+    .game-card.doraothello {
+      border-top: 4px solid #ef4444;
+    }
+
+    .game-card.doraothello .badge {
+      background: linear-gradient(135deg, #ef4444, #f59e0b);
+      color: white;
+    }
+
+    .page-subtitle {
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .header h1::before {
+      content: '🎲 ';
+    }
+
+    .header h1::after {
+      content: ' 🎲';
+    }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="header">
       <h1>테이블 게임</h1>
       <p class="page-subtitle">게임을 선택하세요</p>
+      <div class="header-actions">
+        <button id="installBtn" class="install-btn" type="button" aria-label="앱 설치">앱 설치</button>
+      </div>
     </div>
 
     <div class="games-grid">
@@ -84,7 +175,60 @@
         <p>2~4명 · 약 15분<br>아프리카 물웅덩이를 차지하는 동물 카드게임!</p>
         <span class="badge">테이블 열기</span>
       </a>
+
+      <a href="/HaliGali/" class="game-card haligali">
+        <span class="game-icon">🔔</span>
+        <h2>할리갈리</h2>
+        <p>2~4명 · 약 15분<br>같은 캐릭터가 5명이 모이면 종을 울려라!</p>
+        <span class="badge">게임 시작</span>
+      </a>
+
+      <a href="/co-bingo/" class="game-card cobingo">
+        <span class="game-icon">🎯</span>
+        <h2>Co-Bingo</h2>
+        <p>2인 이상 · 실시간<br>같이 숫자를 부르며 빙고를 완성하세요!</p>
+        <span class="badge">게임 시작</span>
+      </a>
+
+      <a href="/dora-othello/" class="game-card doraothello">
+        <span class="game-icon">⚫⚪</span>
+        <h2>도라에몽 오델로</h2>
+        <p>2명 · 로컬 대전<br>도라에몽 vs 진구 오델로 한판 승부!</p>
+        <span class="badge">게임 시작</span>
+      </a>
     </div>
   </div>
+  <script>
+    let deferredInstallPrompt = null;
+    const installBtn = document.getElementById('installBtn');
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+      installBtn.classList.add('show');
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      try {
+        await deferredInstallPrompt.userChoice;
+      } catch (_) {}
+      deferredInstallPrompt = null;
+      installBtn.classList.remove('show');
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredInstallPrompt = null;
+      installBtn.classList.remove('show');
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
+  </script>
 </body>
+
 </html>

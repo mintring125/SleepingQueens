@@ -1,0 +1,249 @@
+/* ═══════════════════════════════════════
+   BELL CENTER + ZONES
+═══════════════════════════════════════ */
+
+#bell-center {
+  position: relative;
+  width: var(--bell-center-size);
+  height: var(--bell-center-size);
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+/* ── Zone base ── */
+.bell-zone {
+  position: absolute;
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+  cursor: pointer;
+  touch-action: none;
+}
+
+/* Four triangular zones using clip-path */
+/* Top zone (P3 - green) */
+.zone-top {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
+  background: var(--p3-light);
+  transform-origin: bottom center;
+}
+
+/* Bottom zone (P1 - red) */
+.zone-bottom {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  background: var(--p1-light);
+  transform-origin: top center;
+}
+
+/* Left zone (P2 - blue) */
+.zone-left {
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  clip-path: polygon(100% 50%, 0% 0%, 0% 100%);
+  background: var(--p2-light);
+  transform-origin: right center;
+}
+
+/* Right zone (P4 - purple) */
+.zone-right {
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+  background: var(--p4-light);
+  transform-origin: left center;
+}
+
+/* ── Active state: player touched ── */
+.zone-top.active {
+  background: var(--p3-bright);
+  filter: drop-shadow(0 0 20px var(--p3-color));
+  animation: zone-pulse 0.3s ease-out;
+}
+
+.zone-bottom.active {
+  background: var(--p1-bright);
+  filter: drop-shadow(0 0 20px var(--p1-color));
+  animation: zone-pulse 0.3s ease-out;
+}
+
+.zone-left.active {
+  background: var(--p2-bright);
+  filter: drop-shadow(0 0 20px var(--p2-color));
+  animation: zone-pulse 0.3s ease-out;
+}
+
+.zone-right.active {
+  background: var(--p4-bright);
+  filter: drop-shadow(0 0 20px var(--p4-color));
+  animation: zone-pulse 0.3s ease-out;
+}
+
+@keyframes zone-pulse {
+  0% { opacity: 0.5; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.02); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ── Correct: success flash ── */
+.bell-zone.correct {
+  animation: zone-correct 0.6s ease-out !important;
+}
+
+@keyframes zone-correct {
+  0%   { opacity: 1; }
+  25%  { opacity: 0.4; }
+  50%  { opacity: 1; }
+  75%  { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+/* ── Wrong: shake ── */
+.bell-zone.wrong {
+  animation: zone-wrong 0.5s ease-out !important;
+}
+
+@keyframes zone-wrong {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-6px); }
+  40%       { transform: translateX(6px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
+}
+
+/* ── Bell ── */
+.bell {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--bell-size);
+  height: var(--bell-size);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.bell-inner {
+  font-size: calc(var(--bell-size) * 0.6);
+  line-height: 1;
+  filter: drop-shadow(0 4px 12px rgba(255,215,0,0.5));
+  transition: transform 0.15s ease;
+  will-change: transform;
+}
+
+/* Bell ring animation */
+.bell.ringing .bell-inner {
+  animation: bell-ring 0.4s ease-out;
+}
+
+@keyframes bell-ring {
+  0%   { transform: rotate(0deg) scale(1); }
+  15%  { transform: rotate(-25deg) scale(1.1); }
+  35%  { transform: rotate(25deg) scale(1.15); }
+  55%  { transform: rotate(-18deg) scale(1.1); }
+  70%  { transform: rotate(18deg) scale(1.05); }
+  85%  { transform: rotate(-8deg) scale(1.02); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+/* Bell press animation when tapped */
+.bell.pressed .bell-inner {
+  transform: scale(0.88);
+}
+
+/* Bell result overlay */
+.bell-result {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  font-size: calc(var(--bell-size) * 0.55);
+  pointer-events: none;
+}
+
+.bell-result.show-correct {
+  animation: result-pop 0.5s ease-out forwards;
+}
+
+.bell-result.show-wrong {
+  animation: result-pop 0.5s ease-out forwards;
+}
+
+@keyframes result-pop {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+  50%  { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* ── Zone disabled (not that player's area) ── */
+.bell-zone.disabled-zone {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* ── Outer ring glow when bell can be rung ── */
+#bell-center.ringable::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 215, 0, 0.5);
+  animation: ring-glow 1s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 5;
+}
+
+@keyframes ring-glow {
+  0%, 100% { opacity: 0.3; box-shadow: 0 0 10px rgba(255,215,0,0.2); }
+  50%       { opacity: 0.8; box-shadow: 0 0 25px rgba(255,215,0,0.5); }
+}
+
+/* Player-specific: show only active zones (JS also sets inline display) */
+/* 2 players (P1 bottom vs P3 top): split bell area into top/bottom halves */
+#bell-center[data-active-players="2"] .zone-left,
+#bell-center[data-active-players="2"] .zone-right {
+  display: none;
+}
+
+#bell-center[data-active-players="2"] .zone-top {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  clip-path: inset(0 0 0 0);
+  border-top-left-radius: 999px;
+  border-top-right-radius: 999px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+#bell-center[data-active-players="2"] .zone-bottom {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  clip-path: inset(0 0 0 0);
+  border-bottom-left-radius: 999px;
+  border-bottom-right-radius: 999px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+#bell-center[data-active-players="3"] .zone-right {
+  display: none;
+}

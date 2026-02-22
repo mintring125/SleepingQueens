@@ -1,0 +1,318 @@
+/* ═══════════════════════════════════════
+   CARD PILE
+═══════════════════════════════════════ */
+.card-pile {
+  position: relative;
+  width: var(--card-w);
+  height: var(--card-h);
+  flex-shrink: 0;
+}
+
+/* Stack effect: multiple cards behind */
+.pile-stack {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  background: transparent;
+}
+
+/* Visual stacking layers */
+.pile-stack::before,
+.pile-stack::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  background: #1e3a5f;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.pile-stack::before {
+  transform: translate(2px, 2px);
+  z-index: 1;
+}
+
+.pile-stack::after {
+  transform: translate(4px, 4px);
+  z-index: 0;
+}
+
+/* Card count badge */
+.pile-count {
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: var(--text-secondary);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 1px 6px;
+  border-radius: 10px;
+  white-space: nowrap;
+  z-index: 20;
+  pointer-events: none;
+}
+
+/* Pulse when it's this player's turn */
+.hand-pile.active-turn {
+  animation: pile-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pile-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+    filter: brightness(1);
+  }
+
+  50% {
+    box-shadow: 0 0 0 8px rgba(255, 215, 0, 0.15);
+    filter: brightness(1.15);
+  }
+}
+
+/* Dim when not this player's turn */
+.hand-pile.inactive-turn {
+  filter: brightness(0.6);
+}
+
+/* Shake when wrong player tries to swipe */
+.hand-pile.wrong-swipe {
+  animation: pile-shake 0.4s ease;
+}
+
+@keyframes pile-shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* ═══════════════════════════════════════
+   GAME CARD
+═══════════════════════════════════════ */
+.game-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--card-w);
+  height: var(--card-h);
+  transform-style: preserve-3d;
+  perspective: 600px;
+  border-radius: 6px;
+  cursor: default;
+  will-change: transform;
+  z-index: 5;
+}
+
+/* Card faces */
+.card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.card-front {
+  transform: rotateY(180deg);
+  background: #fff;
+}
+
+.card-back {
+  transform: rotateY(0deg);
+  background: #1e3a5f;
+}
+
+/* Fallback visibility control (works even if 3D flip rendering is flaky) */
+.game-card.face-down .card-front {
+  transform: rotateY(180deg);
+  opacity: 0;
+  z-index: 1;
+}
+
+.game-card.face-down .card-back {
+  transform: rotateY(0deg);
+  opacity: 1;
+  z-index: 2;
+}
+
+.game-card.face-up .card-front {
+  transform: rotateY(0deg);
+  opacity: 1;
+  z-index: 2;
+}
+
+.game-card.face-up .card-back {
+  transform: rotateY(180deg);
+  opacity: 0;
+  z-index: 1;
+}
+
+.card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 5px;
+  display: block;
+}
+
+/* Card showing back */
+.game-card.face-down {
+  transform: rotateY(0deg);
+}
+
+/* Card showing front */
+.game-card.face-up {
+  transform: translate(var(--tx, 0px), var(--ty, 0px)) rotateY(180deg) rotate(var(--rz, 0deg));
+}
+
+/* ── Flip animation ── */
+.game-card.flipping {
+  animation: card-flip 500ms ease-in-out forwards;
+}
+
+@keyframes card-flip {
+  0% {
+    transform: translate(0, 0) translateY(0) rotateY(0deg) scale(1);
+  }
+
+  30% {
+    transform: translate(calc(var(--tx, 0px) * 0.2), calc(var(--ty, 0px) * 0.2)) translateY(-20px) rotateY(45deg) scale(1.05);
+  }
+
+  50% {
+    transform: translate(calc(var(--tx, 0px) * 0.5), calc(var(--ty, 0px) * 0.5)) translateY(-30px) rotateY(90deg) scale(1.1);
+  }
+
+  70% {
+    transform: translate(calc(var(--tx, 0px) * 0.8), calc(var(--ty, 0px) * 0.8)) translateY(-20px) rotateY(135deg) rotate(calc(var(--rz, 0deg) * 0.5)) scale(1.05);
+  }
+
+  100% {
+    transform: translate(var(--tx, 0px), var(--ty, 0px)) translateY(0) rotateY(180deg) rotate(var(--rz, 0deg)) scale(1);
+  }
+}
+
+/* ── Card in the revealed pile ── */
+.revealed-pile {
+  position: relative;
+  width: var(--card-w);
+  height: var(--card-h);
+  min-width: var(--card-w);
+}
+
+.revealed-pile .game-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Stacked revealed cards - each slightly offset */
+.revealed-pile .game-card:nth-child(n+2) {
+  top: 2px;
+  left: 2px;
+  filter: brightness(0.7);
+}
+
+.revealed-pile .game-card:last-child {
+  top: 0;
+  left: 0;
+  filter: brightness(1);
+  z-index: 10;
+}
+
+/* ── Card flying animation (collect/penalty) ── */
+.game-card.flying {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1000;
+  transition: transform 0.4s ease-in, opacity 0.4s ease-in;
+}
+
+/* ── Top card on hand pile (interactive) ── */
+.hand-top-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  cursor: grab;
+}
+
+.hand-top-card:active {
+  cursor: grabbing;
+}
+
+/* ── Swipe in progress ── */
+.game-card.swiping {
+  transition: none;
+}
+
+/* ── Card bounce on landing ── */
+.game-card.landing {
+  animation: card-land 0.2s ease-out;
+}
+
+@keyframes card-land {
+  0% {
+    transform: translate(var(--tx, 0px), var(--ty, 0px)) rotateY(180deg) rotate(var(--rz, 0deg)) scale(1.05);
+  }
+
+  50% {
+    transform: translate(var(--tx, 0px), var(--ty, 0px)) rotateY(180deg) rotate(var(--rz, 0deg)) scale(0.97);
+  }
+
+  100% {
+    transform: translate(var(--tx, 0px), var(--ty, 0px)) rotateY(180deg) rotate(var(--rz, 0deg)) scale(1);
+  }
+}
+
+/* ═══════════════════════════════════════
+   PLAYER ORIENTATION (rotated areas)
+═══════════════════════════════════════ */
+
+/* For rotated players, the card faces look correct
+   because the whole player area is rotated */
+/* Cards inherit parent rotation, faces still work */
+
+/* ═══════════════════════════════════════
+   PLACEHOLDER when no card image loaded
+═══════════════════════════════════════ */
+.card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(var(--card-w) * 0.5);
+  gap: 4px;
+  background: linear-gradient(135deg, #1e3a5f, #0f3460);
+  border-radius: 5px;
+}
+
+.card-placeholder .char-emoji {
+  font-size: calc(var(--card-w) * 0.45);
+}
+
+.card-placeholder .char-count {
+  font-size: calc(var(--card-w) * 0.25);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.15);
+  padding: 2px 6px;
+  border-radius: 8px;
+}

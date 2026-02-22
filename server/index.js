@@ -39,13 +39,34 @@ app.use('/kariba/player', express.static(path.join(__dirname, '..', 'client', 'k
 app.use('/kariba/shared', express.static(path.join(__dirname, '..', 'client', 'kariba', 'shared')));
 app.use('/kariba/assets', express.static(path.join(__dirname, '..', 'client', 'kariba', 'assets')));
 
+// Serve static files - HaliGali
+app.use('/HaliGali', express.static(path.join(__dirname, '..', 'client', 'HaliGali')));
+app.use('/haligali', express.static(path.join(__dirname, '..', 'client', 'HaliGali')));
+
+// Serve static files - Co-Bingo
+app.use('/co-bingo', express.static(path.join(__dirname, '..', 'client', 'co-bingo')));
+app.use('/dora-othello', express.static(path.join(__dirname, '..', 'client', 'dora-othello')));
+app.use('/도라에몽오델로', express.static(path.join(__dirname, '..', 'client', 'dora-othello')));
+
+// Shared PWA assets for main page
+app.use('/icons', express.static(path.join(__dirname, '..', 'client', 'icons')));
+
 // Serve node_modules for client-side libs
 app.use('/lib/qrcode', express.static(path.join(__dirname, 'node_modules', 'qrcode', 'build')));
 
 // Routes
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, '..', 'client', 'index.html')));
+app.get('/sw.js', (req, res) => res.sendFile(path.join(__dirname, '..', 'client', 'sw.js')));
+app.get('/manifest-home.json', (req, res) => res.sendFile(path.join(__dirname, '..', 'client', 'manifest-home.json')));
 app.get('/join', (req, res) => res.redirect('/player/join.html'));
 app.get('/kariba', (req, res) => res.redirect('/kariba/table'));
+app.get('/HaliGali', (req, res) => res.redirect('/HaliGali/'));
+app.get('/haligali', (req, res) => res.redirect('/HaliGali/'));
+app.get('/co-bingo', (req, res) => res.redirect('/co-bingo/'));
+app.get('/co-bingo/', (req, res) => res.sendFile(path.join(__dirname, '..', 'client', 'co-bingo', 'index.html')));
+app.get('/dora-othello', (req, res) => res.redirect('/dora-othello/'));
+app.get('/dora-othello/', (req, res) => res.sendFile(path.join(__dirname, '..', 'client', 'dora-othello', 'index.html')));
+app.get('/도라에몽오델로', (req, res) => res.redirect('/dora-othello'));
 app.get('/health', (req, res) => res.status(200).json({ ok: true }));
 
 // QR code API endpoint

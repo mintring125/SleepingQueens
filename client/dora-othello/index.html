@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도라에몽 vs 진구 오델로</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dora-blue: #0093DD;
+            --dora-red: #DD0000;
+            --dora-yellow: #FCEC00;
+            --dora-white: #FFFFFF;
+            --dora-bell: #F8c516;
+            --board-color: #e5b168;
+            /* Light wood */
+            --board-dark: #6D543B;
+        }
+
+        body {
+            font-family: 'Jua', sans-serif;
+            background: url('bg.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            color: #333;
+            overflow: hidden;
+            backdrop-filter: brightness(0.9);
+        }
+
+        h1 {
+            color: var(--dora-white);
+            text-shadow:
+                0 0 5px var(--dora-blue),
+                0 0 10px var(--dora-blue),
+                2px 2px 0px var(--dora-red);
+            margin-bottom: 5px;
+            font-size: 2em;
+            letter-spacing: 2px;
+            z-index: 10;
+        }
+
+        .subtitle {
+            color: var(--dora-yellow);
+            font-size: 1.1em;
+            margin-bottom: 12px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+            background: rgba(0, 147, 221, 0.8);
+            padding: 4px 15px;
+            border-radius: 20px;
+            border: 2px solid white;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: var(--dora-yellow);
+            color: var(--dora-blue);
+            font-size: 0.4em;
+            font-weight: 900;
+            padding: 3px 8px;
+            border-radius: 10px;
+            margin-left: 10px;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            vertical-align: middle;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                box-shadow: 0 2px 15px rgba(252, 236, 0, 0.8);
+            }
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 30px;
+            padding: 15px;
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            box-shadow:
+                0 10px 40px rgba(0, 147, 221, 0.3),
+                inset 0 0 20px rgba(255, 255, 255, 0.5);
+            width: 95vw;
+            height: 90vh;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-evenly;
+            gap: 20px;
+        }
+
+        /* Portrait / Mobile Fallback */
+        @media (max-width: 1000px) or (orientation: portrait) {
+            body {
+                padding: 0;
+            }
+
+            h1 {
+                font-size: 1.5em;
+                margin-top: 10px;
+            }
+
+            .subtitle {
+                display: none;
+            }
+
+            .game-container {
+                flex-direction: column;
+                height: 100vh;
+                width: 100vw;
+                border: none;
+                border-radius: 0;
+                background: rgba(255, 255, 255, 0.2);
+                justify-content: flex-start;
+                padding-top: 10px;
+                gap: 5px;
+            }
+
+            .game-container .info-panel {
+                flex-direction: row;
+                width: 96%;
+                height: auto;
+                padding: 10px;
+                background: rgba(255, 255, 255, 0.85);
+                border: 2px solid var(--dora-blue);
+                box-shadow: 0 5px 15px rgba(0, 147, 221, 0.2);
+                margin-bottom: 10px;
+            }
+
+            .info-panel .player-info {
+                flex-direction: row;
+                padding: 5px 12px;
+                gap: 8px;
+                background: transparent;
+                box-shadow: none;
+                border: none;
+                width: auto;
+                flex: 1;
+            }
+
+            .info-panel .player-img {
+                width: 40px;
+                height: 40px;
+                border: 2px solid var(--dora-blue);
+            }
+
+            .info-panel .player-name {
+                display: block;
+                font-size: 1em;
+            }
+
+            .info-panel .score {
+                font-size: 1.5em;
+            }
+
+            .board-wrapper {
+                width: 94vw;
+                height: 94vw;
+                margin-top: 10px;
+                padding: 5px;
+            }
+
+            .controls {
+                flex-direction: row;
+                position: absolute;
+                bottom: 30px;
+                width: 100%;
+            }
+        }
+
+        .info-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            min-width: 160px;
+            border: 4px solid white;
+        }
+
+        .player-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: 15px;
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            border: 2px solid transparent;
+        }
+
+        .player-info.active {
+            background: #fff;
+            transform: scale(1.05);
+            border-color: var(--dora-yellow);
+            box-shadow: 0 0 20px rgba(252, 236, 0, 0.6);
+        }
+
+        .player-info.active::after {
+            content: 'TURN';
+            position: absolute;
+            top: -10px;
+            right: -5px;
+            background: var(--dora-red);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .player-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            object-fit: cover;
+            background: #eee;
+        }
+
+        .player-info.active .player-img {
+            border-color: var(--dora-yellow);
+        }
+
+        .player-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--dora-blue);
+        }
+
+        .score {
+            font-size: 2em;
+            font-weight: 900;
+            color: #333;
+            font-family: 'Jua', sans-serif;
+            text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+        }
+
+        .vs-badge {
+            font-size: 1.8em;
+            font-weight: 900;
+            color: var(--dora-red);
+            text-shadow: 2px 2px 0px white;
+            font-style: italic;
+            transform: rotate(-10deg);
+        }
+
+        /* Game Board - Futuristic Gadget Style */
+        .board-wrapper {
+            background: var(--dora-blue);
+            padding: 12px;
+            border-radius: 25px;
+            box-shadow:
+                0 20px 50px rgba(0, 71, 107, 0.4),
+                inset 0 2px 5px rgba(255, 255, 255, 0.3);
+            width: 85vmin;
+            height: 85vmin;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid var(--dora-white);
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            gap: 3px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .cell {
+            background: rgba(255, 255, 255, 0.9);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .cell:nth-child(odd) {
+            background: rgba(240, 248, 255, 0.95);
+        }
+
+        .cell:hover {
+            background: #e1f5fe;
+        }
+
+        .cell.valid-move::after {
+            content: '';
+            width: 20%;
+            height: 20%;
+            background: var(--dora-red);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--dora-red);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+        }
+
+        .piece {
+            width: 85%;
+            height: 85%;
+            border-radius: 50%;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backface-visibility: hidden;
+            position: absolute;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .piece-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .piece.entering {
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-family: 'Jua', sans-serif;
+            box-shadow: 0 8px 0px rgba(0, 0, 0, 0.1);
+        }
+
+        .restart-btn {
+            background: var(--dora-red);
+            color: white;
+            border: 3px solid white;
+            box-shadow: 0 5px 15px rgba(221, 0, 0, 0.4);
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05) translateY(-3px);
+            background: #ff1a1a;
+            box-shadow: 0 8px 20px rgba(221, 0, 0, 0.6);
+        }
+
+        .restart-btn:active {
+            transform: scale(0.95) translateY(2px);
+        }
+
+        /* Game Over Modal */
+        .game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 147, 221, 0.6);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .game-over.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .game-over-content {
+            background: white;
+            padding: 40px;
+            border-radius: 40px;
+            text-align: center;
+            border: 8px solid var(--dora-yellow);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .game-over.show .game-over-content {
+            transform: scale(1);
+        }
+
+        .winner-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .winner-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 5px solid var(--dora-yellow);
+        }
+
+        .winner-title {
+            font-size: 2.5em;
+            color: var(--dora-blue);
+            margin: 10px 0;
+        }
+
+        .final-score-text {
+            font-size: 1.5em;
+            color: #555;
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+
+            20% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            80% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>도라에몽 vs 진구<span class="version-badge">v1.0</span></h1>
+    <p class="subtitle">오델로 한판 승부!</p>
+
+    <div class="game-container">
+        <div class="info-panel">
+            <div class="player-info" id="p1-info">
+                <img src="doraemon.png" class="player-img" alt="도라에몽">
+                <div class="player-name">도라에몽</div>
+                <div class="score" id="score-1">2</div>
+            </div>
+
+            <div class="vs-badge">VS</div>
+
+            <div class="player-info" id="p2-info">
+                <img src="nobita.png" class="player-img" alt="진구">
+                <div class="player-name">진구</div>
+                <div class="score" id="score-2">2</div>
+            </div>
+        </div>
+
+        <div class="board-wrapper">
+            <div class="board" id="board"></div>
+        </div>
+
+        <div class="controls">
+            <button class="restart-btn" onclick="initGame()">다시 시작</button>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div class="game-over" id="game-over">
+        <div class="game-over-content">
+            <div class="winner-display">
+                <img src="" id="winner-img" class="winner-img">
+                <h2 class="winner-title" id="winner-text">승리!</h2>
+            </div>
+            <div class="final-score-text" id="final-score"></div>
+            <br>
+            <button class="restart-btn" onclick="initGame()">한판 더!</button>
+        </div>
+    </div>
+
+    <script>
+        const EMPTY = 0;
+        const P1 = 1; // Doraemon
+        const P2 = 2; // Nobita
+
+        const DIRECTIONS = [
+            [-1, -1], [-1, 0], [-1, 1],
+            [0, -1], [0, 1],
+            [1, -1], [1, 0], [1, 1]
+        ];
+
+        let board = [];
+        let currentPlayer = P1;
+        let gameOver = false;
+        let consecutivePasses = 0;
+
+        // Sound effects (Web Audio API)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // 돌 놓기 소리 (빠릿한 '탁' 소리)
+        function playMoveSound() {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.1);
+
+            gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.1);
+        }
+
+        // 돌 뒤집기 소리 (부드러운 '철컥' 소리)
+        function playFlipSound() {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = 'triangle';
+            oscillator.frequency.setValueAtTime(400, audioCtx.currentTime);
+            oscillator.frequency.linearRampToValueAtTime(600, audioCtx.currentTime + 0.05);
+            oscillator.frequency.linearRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+
+            gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.1);
+        }
+
+        // 차례 변경 소리 (상쾌한 '띠링' 소리)
+        function playTurnChangeSound() {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const now = audioCtx.currentTime;
+
+            // 첫 번째 톤
+            const osc1 = audioCtx.createOscillator();
+            const gain1 = audioCtx.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(523.25, now); // C5
+            osc1.frequency.setValueAtTime(659.25, now + 0.1); // E5
+            gain1.gain.setValueAtTime(0.2, now);
+            gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+            osc1.connect(gain1);
+            gain1.connect(audioCtx.destination);
+            osc1.start(now);
+            osc1.stop(now + 0.2);
+
+            // 두 번째 톤
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(659.25, now + 0.15); // E5
+            osc2.frequency.setValueAtTime(783.99, now + 0.25); // G5
+            gain2.gain.setValueAtTime(0.2, now + 0.15);
+            gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+            osc2.connect(gain2);
+            gain2.connect(audioCtx.destination);
+            osc2.start(now + 0.15);
+            osc2.stop(now + 0.35);
+        }
+
+        // 패스 소리 (슬픈 '삐락' 소리)
+        function playPassSound() {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(300, audioCtx.currentTime);
+            oscillator.frequency.linearRampToValueAtTime(150, audioCtx.currentTime + 0.2);
+
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.2);
+        }
+
+        // 게임 종료 승리 소리 (화려한 팬파레)
+        function playVictorySound() {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const now = audioCtx.currentTime;
+            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+
+            notes.forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now + i * 0.15);
+
+                gain.gain.setValueAtTime(0, now + i * 0.15);
+                gain.gain.linearRampToValueAtTime(0.3, now + i * 0.15 + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.15 + 0.4);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(now + i * 0.15);
+                osc.stop(now + i * 0.15 + 0.4);
+            });
+        }
+
+        function initGame() {
+            // 8x8 Board setup
+            board = Array(8).fill(null).map(() => Array(8).fill(EMPTY));
+
+            // Initial positions
+            board[3][3] = P2;
+            board[3][4] = P1;
+            board[4][3] = P1;
+            board[4][4] = P2;
+
+            currentPlayer = P1;
+            gameOver = false;
+            consecutivePasses = 0;
+
+            document.getElementById('game-over').classList.remove('show');
+
+            renderBoard();
+            updateInfo();
+        }
+
+        function renderBoard() {
+            const boardEl = document.getElementById('board');
+            boardEl.innerHTML = '';
+
+            const validMoves = getValidMoves(currentPlayer);
+
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+
+                    if (validMoves.some(m => m.row === row && m.col === col)) {
+                        cell.classList.add('valid-move');
+                        cell.onclick = () => handleClick(row, col);
+                    }
+
+                    if (board[row][col] !== EMPTY) {
+                        const piece = document.createElement('div');
+                        piece.className = 'piece';
+
+                        // Optimize for less DOM thrashing if possible, but recreation is fine here
+                        const img = document.createElement('img');
+                        img.className = 'piece-img';
+                        img.src = board[row][col] === P1 ? 'doraemon.png' : 'nobita.png';
+
+                        piece.appendChild(img);
+                        cell.appendChild(piece);
+                    } else {
+                        if (validMoves.some(m => m.row === row && m.col === col)) {
+                            // Empty cell click only valid if it's a valid move
+                            cell.onclick = () => handleClick(row, col);
+                        }
+                    }
+
+                    boardEl.appendChild(cell);
+                }
+            }
+
+        }
+
+        function handleClick(row, col) {
+            if (gameOver) return;
+
+            // Re-validate just in case
+            const flips = getFlips(row, col, currentPlayer);
+            if (flips.length === 0) return;
+
+            // Place piece
+            board[row][col] = currentPlayer;
+
+            // Play move sound
+            playMoveSound();
+
+            // Process flips with flip sound
+            flips.forEach(({ r, c }) => {
+                board[r][c] = currentPlayer;
+            });
+
+            // Play flip sound if pieces were flipped
+            if (flips.length > 0) {
+                setTimeout(() => playFlipSound(), 100);
+            }
+
+            consecutivePasses = 0;
+            switchTurn();
+        }
+
+        function switchTurn() {
+            currentPlayer = currentPlayer === P1 ? P2 : P1;
+            renderBoard();
+            updateInfo();
+            playTurnChangeSound();
+            checkGameState();
+        }
+
+        function getFlips(row, col, player) {
+            const opponent = player === P1 ? P2 : P1;
+            const allFlips = [];
+
+            for (const [dr, dc] of DIRECTIONS) {
+                const flips = [];
+                let r = row + dr;
+                let c = col + dc;
+
+                while (r >= 0 && r < 8 && c >= 0 && c < 8 && board[r][c] === opponent) {
+                    flips.push({ r, c });
+                    r += dr;
+                    c += dc;
+                }
+
+                if (r >= 0 && r < 8 && c >= 0 && c < 8 && board[r][c] === player && flips.length > 0) {
+                    allFlips.push(...flips);
+                }
+            }
+
+            return allFlips;
+        }
+
+        function getValidMoves(player) {
+            const moves = [];
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    if (board[row][col] === EMPTY && getFlips(row, col, player).length > 0) {
+                        moves.push({ row, col });
+                    }
+                }
+            }
+            return moves;
+        }
+
+        function updateInfo() {
+            let p1Score = 0;
+            let p2Score = 0;
+
+            board.forEach(row => row.forEach(cell => {
+                if (cell === P1) p1Score++;
+                if (cell === P2) p2Score++;
+            }));
+
+            document.getElementById('score-1').textContent = p1Score;
+            document.getElementById('score-2').textContent = p2Score;
+
+            const p1Info = document.getElementById('p1-info');
+            const p2Info = document.getElementById('p2-info');
+
+            if (currentPlayer === P1) {
+                p1Info.classList.add('active');
+                p2Info.classList.remove('active');
+            } else {
+                p1Info.classList.remove('active');
+                p2Info.classList.add('active');
+            }
+        }
+
+        function checkGameState() {
+            const p1Moves = getValidMoves(P1);
+            const p2Moves = getValidMoves(P2);
+
+            // 연속 패스 2번이면 게임 종료
+            if (consecutivePasses >= 2) {
+                endGame();
+                return;
+            }
+
+            // 현재 플레이어가 둘 곳이 없으면 자동으로 다음 차례로
+            if (currentPlayer === P1 && p1Moves.length === 0) {
+                // 진구도 둘 곳이 없으면 게임 종료
+                if (p2Moves.length === 0) {
+                    endGame();
+                    return;
+                }
+                // 진구가 둘 곳이 있으면 자동으로 차례 넘기기
+                playPassSound();
+                showPassMessage("도라에몽이 둘 곳이 없어 패스합니다.");
+                consecutivePasses++;
+                switchTurn();
+                return;
+            }
+
+            if (currentPlayer === P2 && p2Moves.length === 0) {
+                // 도라에몽도 둘 곳이 없으면 게임 종료
+                if (p1Moves.length === 0) {
+                    endGame();
+                    return;
+                }
+                // 도라에몽이 둘 곳이 있으면 자동으로 차례 넘기기
+                playPassSound();
+                showPassMessage("진구가 둘 곳이 없어 패스합니다.");
+                consecutivePasses++;
+                switchTurn();
+                return;
+            }
+
+            // 양쪽 모두 둘 곳이 없으면 게임 종료
+            if (p1Moves.length === 0 && p2Moves.length === 0) {
+                endGame();
+                return;
+            }
+
+            let emptyCount = 0;
+            board.forEach(row => row.forEach(cell => { if (cell === EMPTY) emptyCount++; }));
+            if (emptyCount === 0) endGame();
+        }
+
+        function showPassMessage(message) {
+            // 패스 메시지를 화면에 표시
+            const passMsg = document.createElement('div');
+            passMsg.className = 'pass-message';
+            passMsg.textContent = message;
+            passMsg.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 20px 40px;
+                border-radius: 20px;
+                font-size: 1.5em;
+                z-index: 100;
+                animation: fadeInOut 1.5s forwards;
+            `;
+            document.body.appendChild(passMsg);
+            setTimeout(() => passMsg.remove(), 1500);
+        }
+
+        function endGame() {
+            gameOver = true;
+            let p1Score = 0;
+            let p2Score = 0;
+
+            board.forEach(row => row.forEach(cell => {
+                if (cell === P1) p1Score++;
+                if (cell === P2) p2Score++;
+            }));
+
+            const modal = document.getElementById('game-over');
+            const winnerText = document.getElementById('winner-text');
+            const winnerImg = document.getElementById('winner-img');
+            const finalScore = document.getElementById('final-score');
+
+            if (p1Score > p2Score) {
+                winnerText.textContent = "도라에몽 승리!";
+                winnerText.style.color = "#1E90FF";
+                winnerImg.src = "doraemon.png";
+                winnerImg.style.display = "block";
+            } else if (p2Score > p1Score) {
+                winnerText.textContent = "진구 승리!";
+                winnerText.style.color = "#FFD700";
+                winnerImg.src = "nobita.png";
+                winnerImg.style.display = "block";
+            } else {
+                winnerText.textContent = "무승부!";
+                winnerText.style.color = "#333";
+                winnerImg.style.display = "none";
+            }
+
+            finalScore.textContent = `도라에몽 ${p1Score} : ${p2Score} 진구`;
+            modal.classList.add('show');
+
+            // 승리 효과음 재생 (무승부 제외)
+            if (p1Score !== p2Score) {
+                setTimeout(() => playVictorySound(), 300);
+            }
+        }
+
+        initGame();
+
+    </script>
+</body>
+
+</html>
