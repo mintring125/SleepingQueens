@@ -90,9 +90,20 @@
 }
 
 @keyframes zone-pulse {
-  0% { opacity: 0.5; transform: scale(0.95); }
-  50% { opacity: 1; transform: scale(1.02); }
-  100% { opacity: 1; transform: scale(1); }
+  0% {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* ── Correct: success flash ── */
@@ -101,11 +112,25 @@
 }
 
 @keyframes zone-correct {
-  0%   { opacity: 1; }
-  25%  { opacity: 0.4; }
-  50%  { opacity: 1; }
-  75%  { opacity: 0.6; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+
+  25% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  75% {
+    opacity: 0.6;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 /* ── Wrong: shake ── */
@@ -114,11 +139,27 @@
 }
 
 @keyframes zone-wrong {
-  0%, 100% { transform: translateX(0); }
-  20%       { transform: translateX(-6px); }
-  40%       { transform: translateX(6px); }
-  60%       { transform: translateX(-4px); }
-  80%       { transform: translateX(4px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-6px);
+  }
+
+  40% {
+    transform: translateX(6px);
+  }
+
+  60% {
+    transform: translateX(-4px);
+  }
+
+  80% {
+    transform: translateX(4px);
+  }
 }
 
 /* ── Bell ── */
@@ -138,11 +179,20 @@
 }
 
 .bell-inner {
-  font-size: calc(var(--bell-size) * 0.6);
+  font-size: calc(var(--bell-size) * 0.65);
   line-height: 1;
-  filter: drop-shadow(0 4px 12px rgba(255,215,0,0.5));
-  transition: transform 0.15s ease;
+  filter: drop-shadow(0 10px 20px rgba(255, 215, 0, 0.4)) drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
+  transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   will-change: transform;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2), transparent);
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  box-shadow: inset 0 0 40px rgba(255, 215, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Bell ring animation */
@@ -151,13 +201,33 @@
 }
 
 @keyframes bell-ring {
-  0%   { transform: rotate(0deg) scale(1); }
-  15%  { transform: rotate(-25deg) scale(1.1); }
-  35%  { transform: rotate(25deg) scale(1.15); }
-  55%  { transform: rotate(-18deg) scale(1.1); }
-  70%  { transform: rotate(18deg) scale(1.05); }
-  85%  { transform: rotate(-8deg) scale(1.02); }
-  100% { transform: rotate(0deg) scale(1); }
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  15% {
+    transform: rotate(-25deg) scale(1.1);
+  }
+
+  35% {
+    transform: rotate(25deg) scale(1.15);
+  }
+
+  55% {
+    transform: rotate(-18deg) scale(1.1);
+  }
+
+  70% {
+    transform: rotate(18deg) scale(1.05);
+  }
+
+  85% {
+    transform: rotate(-8deg) scale(1.02);
+  }
+
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
 }
 
 /* Bell press animation when tapped */
@@ -185,9 +255,20 @@
 }
 
 @keyframes result-pop {
-  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
-  50%  { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
-  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
 /* ── Zone disabled (not that player's area) ── */
@@ -209,8 +290,17 @@
 }
 
 @keyframes ring-glow {
-  0%, 100% { opacity: 0.3; box-shadow: 0 0 10px rgba(255,215,0,0.2); }
-  50%       { opacity: 0.8; box-shadow: 0 0 25px rgba(255,215,0,0.5); }
+
+  0%,
+  100% {
+    opacity: 0.3;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+  }
+
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+  }
 }
 
 /* Player-specific: show only active zones (JS also sets inline display) */

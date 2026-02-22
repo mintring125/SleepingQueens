@@ -1,16 +1,32 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <title>할리갈리 🔔</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&family=Poppins:wght@600;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/bell.css">
   <link rel="stylesheet" href="css/card.css">
   <link rel="stylesheet" href="css/effects.css">
+  <!-- SVG filters for glow and shadow effects -->
+  <svg style="width:0;height:0;position:absolute;" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+    </defs>
+  </svg>
 </head>
+
 <body>
 
   <!-- ══════════════════════════════════
@@ -144,10 +160,10 @@
       <!-- Bell Center -->
       <div id="bell-center">
         <!-- Color zones (fan/quadrant) -->
-        <div class="bell-zone zone-top"    id="zone-3" data-player="3"></div>
-        <div class="bell-zone zone-left"   id="zone-2" data-player="2"></div>
+        <div class="bell-zone zone-top" id="zone-3" data-player="3"></div>
+        <div class="bell-zone zone-left" id="zone-2" data-player="2"></div>
         <div class="bell-zone zone-bottom" id="zone-1" data-player="1"></div>
-        <div class="bell-zone zone-right"  id="zone-4" data-player="4"></div>
+        <div class="bell-zone zone-right" id="zone-4" data-player="4"></div>
 
         <!-- Bell -->
         <div id="bell" class="bell">
@@ -254,4 +270,5 @@
   <script src="js/game.js"></script>
   <script src="js/main.js"></script>
 </body>
+
 </html>
